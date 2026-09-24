@@ -367,7 +367,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 .lead-form h3{ font-size:1.02rem; }
 .lead-form p{ font-size:.85rem; color:var(--ink-soft); margin:0; line-height:1.6; }
 .lead-form input{ width:100%; font-family:inherit; font-size:.95rem; padding:12px 14px;
-  border-radius:13px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); }
+  border-radius:13px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink);
+  /* דפדפנים מיישרים שדה טלפון לשמאל כברירת מחדל — מיישרים בחזרה לימין */
+  direction:rtl; text-align:start; }
 .lead-form input:focus{ outline:2px solid var(--accent); outline-offset:1px; }
 .lead-form .lf-err{ color:var(--critical); font-size:.82rem; min-height:1em; margin:0; }
 
@@ -506,7 +508,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 
       <div class="hero-welcome">ברוכים הבאים</div>
       <h2>בכמה דקות תגלה/י מה הקול שלך צריך</h2>
-      <p class="hero-lead">רוב האנשים מתאמנים שנים על הדבר הלא נכון — פשוט כי אף אחד מעולם לא אמר להם מה בדיוק עוצר את הקול שלהם. דקה אחת של שירה למיקרופון, ואת/ה יודע/ת.</p>
+      <p class="hero-lead">לכל קול יש נקודה אחת שפותחת אותו יותר מכל השאר. דקה אחת של שירה למיקרופון, ותדע/י מה הנקודה הזו אצלך — ועל מה הכי כדאי לך לעבוד עכשיו.</p>
       <button class="btn primary" id="heroStartBtn">בואו נתחיל</button>
       <div class="hero-note">בלי הרשמה · בלי התחייבות · התוצאה מיידית</div>
       <div class="hero-steps">
