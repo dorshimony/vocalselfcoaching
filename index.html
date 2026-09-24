@@ -1177,58 +1177,141 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   };
   var voiceGenderShift = 1;   // נשים: פורמנטים גבוהים מעט יותר
 
-  // צליל פסנתר: סכום הרמוניות עם דעיכה מהירה יותר ככל שההרמוניה גבוהה,
-  // ועם אי-הרמוניות קלה — מה שנותן לפסנתר את הצליל שלו ולא צפצוף.
+  // ===================== צליל פסנתר =====================
+  // מה שהופך צליל לפסנתר ולא לאורגן זה לא ההרמוניות אלא שלושה דברים:
+  // נקישת הפטיש בהתחלה, שלושה מיתרים מכוונים בהפרש זעיר שיוצרים פעימה,
+  // ותהודת גוף הכלי. כל השלושה כאן.
+
   var PIANO_PARTIALS = [
-    { n:1, amp:1.00, decay:1.00 },
-    { n:2, amp:0.44, decay:0.72 },
-    { n:3, amp:0.26, decay:0.55 },
-    { n:4, amp:0.15, decay:0.44 },
-    { n:5, amp:0.085, decay:0.36 },
-    { n:6, amp:0.05, decay:0.30 },
-    { n:8, amp:0.025, decay:0.22 }
+    { n:1,  amp:1.00, decay:1.00, strings:3 },
+    { n:2,  amp:0.50, decay:0.74, strings:3 },
+    { n:3,  amp:0.30, decay:0.58, strings:2 },
+    { n:4,  amp:0.19, decay:0.46, strings:1 },
+    { n:5,  amp:0.12, decay:0.38, strings:1 },
+    { n:6,  amp:0.075, decay:0.31, strings:1 },
+    { n:7,  amp:0.048, decay:0.26, strings:1 },
+    { n:9,  amp:0.026, decay:0.20, strings:1 },
+    { n:11, amp:0.014, decay:0.16, strings:1 }
   ];
+  var STRING_DETUNE = [0, -0.55, 0.65];   // בסנטים — מייצר את הפעימה החיה
+
+  var pianoNoise = null, pianoVerb = null, pianoBus = null;
+
+  function pianoNoiseBuffer(ctx){
+    if (pianoNoise) return pianoNoise;
+    var len = Math.floor(ctx.sampleRate * 0.3);
+    pianoNoise = ctx.createBuffer(1, len, ctx.sampleRate);
+    var d = pianoNoise.getChannelData(0);
+    for (var i=0; i<len; i++) d[i] = Math.random()*2 - 1;
+    return pianoNoise;
+  }
+
+  // תהודת גוף הכלי: הד קצר מאוד, מה שמוציא את הצליל מהמצב ה"סינתטי"
+  function pianoReverb(ctx){
+    if (pianoVerb) return pianoVerb;
+    var secs = 1.1, len = Math.floor(ctx.sampleRate * secs);
+    var buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (var ch=0; ch<2; ch++){
+      var d = buf.getChannelData(ch);
+      for (var i=0; i<len; i++){
+        d[i] = (Math.random()*2 - 1) * Math.pow(1 - i/len, 2.6);
+      }
+    }
+    pianoVerb = ctx.createConvolver();
+    pianoVerb.buffer = buf;
+    return pianoVerb;
+  }
+
+  // אפיק אחד משותף לכל התווים: חוסך חישוב בטלפון
+  function pianoOutput(ctx){
+    if (pianoBus) return pianoBus;
+
+    var body = ctx.createBiquadFilter();       // תהודת התיבה
+    body.type = 'peaking'; body.frequency.value = 280; body.Q.value = 0.8; body.gain.value = 3.5;
+
+    var air = ctx.createBiquadFilter();        // פתיחות בגבהים
+    air.type = 'highshelf'; air.frequency.value = 3800; air.gain.value = 2.5;
+
+    var tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass'; tone.frequency.value = 9000; tone.Q.value = 0.3;
+
+    var dry = ctx.createGain(); dry.gain.value = 0.88;
+    var wet = ctx.createGain(); wet.gain.value = 0.16;
+    var master = ctx.createGain(); master.gain.value = TONE_GAIN * 0.62;
+
+    // מגביל: שומר על צליל חזק בלי שהשיאים ייחתכו ויישמעו מרוסקים
+    var limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -8;
+    limiter.knee.value = 6;
+    limiter.ratio.value = 14;
+    limiter.attack.value = 0.002;
+    limiter.release.value = 0.22;
+
+    body.connect(air); air.connect(tone);
+    tone.connect(dry); dry.connect(master);
+    tone.connect(pianoReverb(ctx)); pianoReverb(ctx).connect(wet); wet.connect(master);
+    master.connect(limiter); limiter.connect(ctx.destination);
+
+    pianoBus = body;
+    return pianoBus;
+  }
 
   function playPiano(freq, dur, silent){
     var ctx = ensureAudioCtx();
     if (!silent) markAudioBusy(dur*1000);
-    var t0 = ctx.currentTime;
+    var t0 = ctx.currentTime + 0.01;
+    var bus = pianoOutput(ctx);
 
-    var out = ctx.createGain();
-    out.gain.value = TONE_GAIN * 0.9;
-    var tone = ctx.createBiquadFilter();
-    tone.type = 'lowpass';
-    tone.frequency.value = 6200;
-    tone.Q.value = 0.4;
-    tone.connect(out);
-    out.connect(ctx.destination);
+    // תווים גבוהים דועכים מהר יותר, כמו בכלי אמיתי
+    var lenScale = clamp(1.7 - freq/520, 0.55, 1.5);
 
-    var B = 0.0004;   // אי-הרמוניות של מיתר אמיתי
-    PIANO_PARTIALS.forEach(function(p){
-      var f = freq * p.n * Math.sqrt(1 + B*p.n*p.n);
-      if (f > 11000) return;
-      var osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = f;
-      var g = ctx.createGain();
-      var peak = p.amp;
-      var tail = Math.max(0.35, dur * p.decay);
-      g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(peak, t0 + 0.006);          // נקישה מהירה
-      g.gain.exponentialRampToValueAtTime(peak*0.30, t0 + 0.18);      // נפילה ראשונית
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + tail);         // זנב ארוך
-      osc.connect(g); g.connect(tone);
-      osc.start(t0);
-      osc.stop(t0 + tail + 0.05);
-      trackOsc(osc, g);
+    // נקישת הפטיש
+    var hammer = ctx.createBufferSource();
+    hammer.buffer = pianoNoiseBuffer(ctx);
+    var hf = ctx.createBiquadFilter();
+    hf.type = 'bandpass';
+    hf.frequency.value = clamp(freq*2.6, 300, 5200);
+    hf.Q.value = 0.7;
+    var hg = ctx.createGain();
+    hg.gain.setValueAtTime(0.0001, t0);
+    hg.gain.exponentialRampToValueAtTime(0.16, t0 + 0.002);
+    hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.055);
+    hammer.connect(hf); hf.connect(hg); hg.connect(bus);
+    hammer.start(t0); hammer.stop(t0 + 0.12);
+    trackOsc(hammer, hg);
+
+    var B = 0.00042;   // אי-הרמוניות של מיתר אמיתי
+    PIANO_PARTIALS.forEach(function(prt){
+      var base = freq * prt.n * Math.sqrt(1 + B*prt.n*prt.n);
+      if (base > 12000) return;
+      var tail = Math.max(0.3, dur * prt.decay * lenScale);
+      var count = prt.strings;
+      for (var k=0; k<count; k++){
+        var osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = base;
+        osc.detune.value = STRING_DETUNE[k] * prt.n;
+        var g = ctx.createGain();
+        var peak = prt.amp / count;
+        // הגבהים נכנסים שבריר שנייה אחרי היסוד — כמו בפגיעת פטיש
+        var att = 0.004 + prt.n*0.0009 + k*0.0012;
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(peak, t0 + att);
+        g.gain.exponentialRampToValueAtTime(peak*0.34, t0 + 0.16);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + tail);
+        osc.connect(g); g.connect(bus);
+        osc.start(t0);
+        osc.stop(t0 + tail + 0.05);
+        trackOsc(osc, g);
+      }
     });
   }
 
   function playPianoSequence(freqs, noteDur){
-    markAudioBusy(freqs.length * noteDur * 1000 + 600);
+    markAudioBusy(freqs.length * noteDur * 1000 + 800);
     freqs.forEach(function(f, i){
       toneTimers.push(setTimeout(function(){
-        playPiano(f, noteDur * 1.45, true);
+        playPiano(f, noteDur * 1.6, true);
       }, i * noteDur * 1000));
     });
   }
