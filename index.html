@@ -226,6 +226,8 @@ svg.chart{ width:100%; height:auto; overflow:visible; }
 .meter-why{ font-size:.79rem; color:var(--ink-faint); margin:-3px 0 7px; line-height:1.5; }
 .meter-scale{ display:flex; justify-content:space-between; font-size:.73rem; color:var(--ink-faint); margin-top:6px; }
 
+.table-note{ width:100%; font-size:.86rem; color:var(--ink-soft); line-height:1.6;
+  margin:14px 0 4px; text-align:start; }
 table.vowel-table{ width:100%; border-collapse:separate; border-spacing:6px; font-size:.87rem; text-align:center; }
 table.vowel-table th{ font-size:.79rem; color:var(--ink-soft); font-weight:600; padding:4px 2px; }
 table.vowel-table th.rowhead{ text-align:start; white-space:nowrap; }
@@ -761,6 +763,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
           <p>הטווח שנקלט חולק לשלושה חלקים, לפי מה שנשמע בפועל. הציון מבוסס על כמה אוברטונים נחשפו, כמה אנרגיית צלצול הייתה בצליל וכמה רעש נשיפה ליווה אותו. ציון גבוה = ההגייה נושאת בקלות רבה יותר באותו חלק של הטווח.</p>
         </div>
         <div class="plain-summary" id="vowelPlain"></div>
+        <p class="table-note">בטבלה: מספר גבוה = בגובה הזה ההגייה הזו יצאה לך הפתוחה והנושאת ביותר.</p>
         <div class="tbl-wrap"><table class="vowel-table" id="vowelTable"></table></div>
         <div id="vowelRecs" class="meter-row"></div>
       </div>
@@ -815,7 +818,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 
 <button class="btn primary" id="stopAudioBtn" hidden
   style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:30; box-shadow:var(--shadow);">
-  ⏹ דלג/י על ההשמעה — אני מוכן/ה לשיר
+  ⏹ עצור/י את ההשמעה
 </button>
 
 <script>
@@ -922,7 +925,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     }, true);
   });
 
-  var mic = { src:null, analyser:null, stream:null, timeBuf:null, freqBuf:null, ready:false };
+  var mic = { src:null, analyser:null, sink:null, stream:null, timeBuf:null, freqBuf:null, ready:false };
 
   function ensureMic(){
     if (mic.ready) return Promise.resolve(mic);
@@ -944,14 +947,25 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
         mic.timeBuf = new Float32Array(mic.analyser.fftSize);
         mic.freqBuf = new Float32Array(mic.analyser.frequencyBinCount);
         mic.src.connect(mic.analyser);
+
+        // ספארי, ובעיקר באייפון, לא מריץ בכלל ענף שמע שלא מגיע עד הפלט.
+        // בלי החיבור הזה הצומת המנתח מחזיר אפסים, ולכן הקול "לא נקלט"
+        // למרות שההרשאה ניתנה והמיקרופון פעיל. בכרום זה עבד בלעדיו.
+        mic.sink = ctx.createGain();
+        mic.sink.gain.value = 0;          // אפס עוצמה: שומעים כלום, אבל הענף רץ
+        mic.analyser.connect(mic.sink);
+        mic.sink.connect(ctx.destination);
+
         mic.ready = true;
         return mic;
       });
   }
   function releaseMic(){
     if (mic.src){ try { mic.src.disconnect(); } catch(e){} }
+    if (mic.analyser){ try { mic.analyser.disconnect(); } catch(e){} }
+    if (mic.sink){ try { mic.sink.disconnect(); } catch(e){} }
     if (mic.stream) mic.stream.getTracks().forEach(function(t){ t.stop(); });
-    mic.ready = false; mic.stream = null; mic.src = null; mic.analyser = null;
+    mic.ready = false; mic.stream = null; mic.src = null; mic.analyser = null; mic.sink = null;
   }
   // זיהוי סוג המכשיר, כדי לא לשלוח מישהו בטלפון לחפש מנעול שאין שם
   var ua = navigator.userAgent || '';
@@ -965,9 +979,19 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   // בדיוק איפה לשחרר אותה, לפי המכשיר.
   function micDeniedHelp(){
     if (isIOS){
-      return '<b>הגישה למיקרופון חסומה.</b><br>'
-        + 'בספארי: הקש/י על <b>aA</b> שמשמאל לכתובת האתר למעלה ← '
-        + '<b>הגדרות אתר</b> ← <b>מיקרופון</b> ← <b>אפשר</b>, ואז רענן/י את העמוד.';
+      // באייפון ההרשאה ניתנת לאפליקציית הדפדפן עצמה בהגדרות המכשיר,
+      // ואם היא חסומה שם — שום חלונית לא תוקפץ בכלל.
+      var app = 'ספארי';
+      if (/CriOS/.test(ua)) app = 'כרום';
+      else if (/FxiOS/.test(ua)) app = 'פיירפוקס';
+      else if (/EdgiOS/.test(ua)) app = 'אדג\'';
+      var txt = '<b>הגישה למיקרופון חסומה.</b><br>'
+        + '<b>1.</b> באייפון: <b>הגדרות</b> ← <b>' + app + '</b> ← <b>מיקרופון</b> ← להדליק.<br>';
+      if (app === 'ספארי'){
+        txt += '<b>2.</b> ואז בדפדפן: <b>aA</b> שמשמאל לכתובת ← '
+             + '<b>הגדרות אתר</b> ← <b>מיקרופון</b> ← <b>אפשר</b>.<br>';
+      }
+      return txt + 'אחרי זה לסגור את הלשונית ולפתוח את האתר מחדש.';
     }
     if (isAndroid){
       return '<b>הגישה למיקרופון חסומה.</b><br>'
@@ -1111,6 +1135,12 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   }
 
   function micCheckLoop(){
+    if (DEBUG && mic.ready && mic.analyser){
+      mic.analyser.getFloatTimeDomainData(mic.timeBuf);
+      var dp = detectPitch(mic.timeBuf, audioCtx.sampleRate);
+      dbg('MIC CHECK  rms=' + dp.rms.toFixed(4) + '  clarity=' + dp.clarity.toFixed(3)
+        + '  hz=' + (dp.freq>0 ? dp.freq.toFixed(1) : '-') + '\n' + dbgEnv());
+    }
     if (!micChecking || !mic.ready) return;
     micCheckRaf = requestAnimationFrame(micCheckLoop);
     mic.analyser.getFloatTimeDomainData(mic.timeBuf);
@@ -1133,6 +1163,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   function markAudioBusy(ms){
     var btn=document.getElementById('stopAudioBtn');
     if (!btn) return;
+    // בתוך מבחן או בדיקת הגייה אין מה לעצור — הסולם קצר והמסך ממילא
+    // עובר להקשבה לבד. הכפתור שם רק בילבל.
+    if (testInProgress || vowelInProgress){ btn.hidden = true; return; }
     btn.hidden=false;
     clearTimeout(audioBusyTimer);
     audioBusyTimer=setTimeout(function(){ btn.hidden=true; }, ms+200);
@@ -1189,11 +1222,11 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     { n:4,  amp:0.19, decay:0.46, strings:1 },
     { n:5,  amp:0.12, decay:0.38, strings:1 },
     { n:6,  amp:0.075, decay:0.31, strings:1 },
-    { n:7,  amp:0.048, decay:0.26, strings:1 },
-    { n:9,  amp:0.026, decay:0.20, strings:1 },
-    { n:11, amp:0.014, decay:0.16, strings:1 }
+    { n:7,  amp:0.035, decay:0.24, strings:1 },
+    { n:8,  amp:0.018, decay:0.19, strings:1 }
   ];
-  var STRING_DETUNE = [0, -0.55, 0.65];   // בסנטים — מייצר את הפעימה החיה
+  // הפרש זעיר בלבד. הפרש גדול נשמע כמו שני תווים ולא כמו תו אחד חי.
+  var STRING_DETUNE = [0, -0.35, 0.4];
 
   var pianoNoise = null, pianoVerb = null, pianoBus = null;
 
@@ -1209,7 +1242,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   // תהודת גוף הכלי: הד קצר מאוד, מה שמוציא את הצליל מהמצב ה"סינתטי"
   function pianoReverb(ctx){
     if (pianoVerb) return pianoVerb;
-    var secs = 1.1, len = Math.floor(ctx.sampleRate * secs);
+    var secs = 0.42, len = Math.floor(ctx.sampleRate * secs);
     var buf = ctx.createBuffer(2, len, ctx.sampleRate);
     for (var ch=0; ch<2; ch++){
       var d = buf.getChannelData(ch);
@@ -1227,7 +1260,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     if (pianoBus) return pianoBus;
 
     var body = ctx.createBiquadFilter();       // תהודת התיבה
-    body.type = 'peaking'; body.frequency.value = 280; body.Q.value = 0.8; body.gain.value = 3.5;
+    body.type = 'peaking'; body.frequency.value = 240; body.Q.value = 1.1; body.gain.value = 2.0;
 
     var air = ctx.createBiquadFilter();        // פתיחות בגבהים
     air.type = 'highshelf'; air.frequency.value = 3800; air.gain.value = 2.5;
@@ -1235,8 +1268,8 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     var tone = ctx.createBiquadFilter();
     tone.type = 'lowpass'; tone.frequency.value = 9000; tone.Q.value = 0.3;
 
-    var dry = ctx.createGain(); dry.gain.value = 0.88;
-    var wet = ctx.createGain(); wet.gain.value = 0.16;
+    var dry = ctx.createGain(); dry.gain.value = 1.0;
+    var wet = ctx.createGain(); wet.gain.value = 0.045;
     var master = ctx.createGain(); master.gain.value = TONE_GAIN * 0.62;
 
     // מגביל: שומר על צליל חזק בלי שהשיאים ייחתכו ויישמעו מרוסקים
@@ -1280,7 +1313,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     hammer.start(t0); hammer.stop(t0 + 0.12);
     trackOsc(hammer, hg);
 
-    var B = 0.00042;   // אי-הרמוניות של מיתר אמיתי
+    var B = 0.00022;   // אי-הרמוניות של מיתר אמיתי
     PIANO_PARTIALS.forEach(function(prt){
       var base = freq * prt.n * Math.sqrt(1 + B*prt.n*prt.n);
       if (base > 12000) return;
@@ -1290,7 +1323,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
         var osc = ctx.createOscillator();
         osc.type = 'sine';
         osc.frequency.value = base;
-        osc.detune.value = STRING_DETUNE[k] * prt.n;
+        osc.detune.value = STRING_DETUNE[k];
         var g = ctx.createGain();
         var peak = prt.amp / count;
         // הגבהים נכנסים שבריר שנייה אחרי היסוד — כמו בפגיעת פטיש
@@ -1552,7 +1585,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
         // BUG-05 fix: אם לא נקלט קול, אין להמשיך ואין להמציא תוצאה
         if (!measure.voiced){
           silentStreak++;
-          if (idx === 0 || silentStreak >= 2){ abortForSilence(measure); return; }
+          // עוצרים רק כשבאמת לא נכנס שום קול. אם נשמע משהו אבל לא זוהה
+          // גובה — נותנים עוד שני סולמות לפני שמכריזים על כשל.
+          if (measure.silent || silentStreak >= 3){ abortForSilence(measure); return; }
         } else {
           silentStreak = 0;
         }
@@ -1566,6 +1601,37 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     }
     skipPlayback = startListening;
     listenTimer = later(startListening, scaleMs + 500);
+  }
+
+  // מצב אבחון לבדיקות מרחוק: פותחים את הכתובת עם debug=1 בסוף
+  var DEBUG = /[?&]debug=1/.test(location.search);
+  var dbgBox = null;
+  function dbg(info){
+    if (!DEBUG) return;
+    if (!dbgBox){
+      dbgBox = document.createElement('div');
+      dbgBox.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99;'
+        + 'background:#111;color:#0f0;font:11px/1.5 monospace;padding:7px 10px;'
+        + 'direction:ltr;text-align:left;white-space:pre-wrap;';
+      document.body.appendChild(dbgBox);
+    }
+    dbgBox.textContent = info;
+  }
+  function dbgEnv(){
+    if (!DEBUG) return '';
+    var t = 'sr=' + (audioCtx ? audioCtx.sampleRate : '?')
+          + ' state=' + (audioCtx ? audioCtx.state : '?')
+          + ' fft=' + (mic.analyser ? mic.analyser.fftSize : '?');
+    if (navigator.audioSession) t += ' session=' + navigator.audioSession.type;
+    var tr = mic.stream ? mic.stream.getAudioTracks()[0] : null;
+    if (tr){
+      t += ' track=' + tr.readyState + (tr.muted ? ' MUTED' : '') + (tr.enabled ? '' : ' DISABLED');
+      try {
+        var st = tr.getSettings();
+        t += ' ch=' + st.channelCount + ' ec=' + st.echoCancellation + ' agc=' + st.autoGainControl;
+      } catch(e){}
+    }
+    return t;
   }
 
   var SILENCE_RMS = 0.012;      // מתחת לזה נחשב שקט מוחלט
@@ -1586,8 +1652,11 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
       var hf = highFreqRatio(mic.freqBuf, audioCtx.sampleRate, mic.analyser.fftSize);
       if (p.rms > peakLevel) peakLevel = p.rms;
       document.getElementById('levelFill').style.width = clamp(p.rms*450,0,100)+'%';
+      dbg('rms=' + p.rms.toFixed(4) + '  peak=' + peakLevel.toFixed(4)
+        + '  clarity=' + p.clarity.toFixed(3) + '  hz=' + (p.freq>0 ? p.freq.toFixed(1) : '-')
+        + '  frames=' + frames.length + '\n' + dbgEnv());
 
-      if (p.rms > 0.010 && p.freq > 60 && p.freq < 1200 && p.clarity > 0.25){
+      if (p.rms > 0.008 && p.freq > 60 && p.freq < 1200 && p.clarity > 0.18){
         frames.push({ rms:p.rms, clarity:p.clarity, hf:hf, freq:p.freq });
         if (frames.length === 3){
           liveBadge.textContent = '✓ הקול נקלט';
@@ -1614,7 +1683,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   }
 
   function summarizeRound(start, frames){
-    if (frames.length < 5) return { start:start, voiced:false, air:null, pressure:null };
+    if (frames.length < 3) return { start:start, voiced:false, air:null, pressure:null };
     var avg = function(k){ return frames.reduce(function(a,f){ return a+f[k]; },0)/frames.length; };
     var clarity = avg('clarity'), hf = avg('hf'), rms = avg('rms');
 
@@ -2160,7 +2229,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
       var p = detectPitch(mic.timeBuf, audioCtx.sampleRate);
       if (p.rms > peakLevel) peakLevel = p.rms;
       document.getElementById('vowelLevel').style.width = clamp(p.rms*450,0,100)+'%';
-      if (p.rms > 0.010 && p.freq > 60 && p.freq < 1200 && p.clarity > 0.25){
+      if (p.rms > 0.008 && p.freq > 60 && p.freq < 1200 && p.clarity > 0.18){
         var m = spectralMetrics(mic.freqBuf, audioCtx.sampleRate, mic.analyser.fftSize, p.freq);
         var info = freqToNoteInfo(p.freq);
         if (info){ m.midi = info.midi; vowelFrames[v.id].push(m); collected++;
