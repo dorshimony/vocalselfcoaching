@@ -1478,6 +1478,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 
   var testAbort=false, testTimers=[], activeInterval=null, testResults=[], testStarts=[];
   var testInProgress=false, currentTestIdx=0;
+  var activeRound = null;   // הסולם שנקלט ברגע זה, כדי לא לאבד אותו בעצירה מוקדמת
   function clearTestTimers(){
     testTimers.forEach(clearTimeout); testTimers = [];
     if (activeInterval){ clearInterval(activeInterval); activeInterval=null; }
@@ -1512,9 +1513,22 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   });
 
   document.getElementById('stopEarlyBtn').addEventListener('click', function(){
-    testInProgress = false; releaseWakeLock(); pausedRun = null;
+    testInProgress = false; releaseWakeLock(); pausedRun = null; skipPlayback = null;
     document.getElementById('testResumeBar').hidden = true;
-    testAbort = true; clearTestTimers(); stopAllTones(); releaseMic();
+    testAbort = true;
+    if (activeInterval){ clearInterval(activeInterval); activeInterval = null; }
+    clearTestTimers(); stopAllTones();
+
+    // הסולם שהמשתמש שר ממש עכשיו עדיין לא נרשם, כי הוא נרשם רק בסוף
+    // חלון ההקלטה. בלי זה לחיצה על "הגעתי לגבול" הייתה מוחקת אותו.
+    if (activeRound && activeRound.frames.length >= 3){
+      var partial = summarizeRound(activeRound.start, activeRound.frames);
+      partial.silent = false;
+      testResults.push(partial);
+    }
+    activeRound = null;
+    releaseMic();
+
     if (testResults.length){ testAbort = false; finishTest(testResults); }
     else { showStage('intro'); testHint.textContent='המבחן נעצר לפני שנקלט צליל.'; }
   });
@@ -1640,6 +1654,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 
   function collectRound(start, durationMs, done){
     var frames = [], started = Date.now(), peakLevel = 0;
+    activeRound = { start:start, frames:frames };
     var liveBadge = document.getElementById('liveHeard');
     liveBadge.textContent = 'ממתין לקול…';
     liveBadge.className = 'live-badge waiting';
@@ -1667,13 +1682,13 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
       // אין שום קליטה — אין טעם להמשיך לחכות
       var elapsed = Date.now() - started;
       if (elapsed >= SILENCE_BAILOUT_MS && frames.length === 0 && peakLevel < SILENCE_RMS){
-        clearInterval(activeInterval); activeInterval=null;
+        clearInterval(activeInterval); activeInterval=null; activeRound = null;
         done({ start:start, voiced:false, silent:true, peak:peakLevel, air:null, pressure:null });
         return;
       }
 
       if (elapsed >= durationMs){
-        clearInterval(activeInterval); activeInterval=null;
+        clearInterval(activeInterval); activeInterval=null; activeRound = null;
         var summary = summarizeRound(start, frames);
         summary.silent = (peakLevel < SILENCE_RMS);
         summary.peak = peakLevel;
