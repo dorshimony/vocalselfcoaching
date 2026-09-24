@@ -295,12 +295,27 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 .resume-bar p{ margin:0; font-size:.9rem; line-height:1.6; text-align:center; }
 
 /* ---------- Landing hero ---------- */
-.hero{ padding:30px 24px 26px; text-align:center; display:flex; flex-direction:column;
-  align-items:center; gap:14px; }
-.hero h2{ font-size:1.72rem; font-weight:800; line-height:1.25; max-width:18ch; }
-.hero .hero-lead{ color:var(--ink-soft); font-size:1rem; line-height:1.65; max-width:34ch; margin:0; }
-.hero .btn.primary{ padding:14px 30px; font-size:1rem; }
-.hero .hero-steps{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center;
+.hero{ padding:26px 24px 26px; text-align:center; display:flex; flex-direction:column;
+  align-items:center; gap:13px; }
+.hero-art{ width:min(100%,280px); height:auto; margin-bottom:-4px; }
+.hero-bars rect{ transform-box:fill-box; transform-origin:center bottom;
+  animation:heroPulse 2.4s ease-in-out infinite; }
+.hero-bars rect:nth-child(1){ animation-delay:0s }
+.hero-bars rect:nth-child(2){ animation-delay:.12s }
+.hero-bars rect:nth-child(3){ animation-delay:.24s }
+.hero-bars rect:nth-child(4){ animation-delay:.36s }
+.hero-bars rect:nth-child(5){ animation-delay:.18s }
+.hero-bars rect:nth-child(6){ animation-delay:.30s }
+.hero-bars rect:nth-child(7){ animation-delay:.42s }
+.hero-bars rect:nth-child(8){ animation-delay:.54s }
+@keyframes heroPulse{ 0%,100%{ transform:scaleY(1) } 50%{ transform:scaleY(.55) } }
+.hero-welcome{ font-size:.86rem; font-weight:700; letter-spacing:.14em;
+  color:var(--coral); text-transform:none; }
+.hero h2{ font-size:1.68rem; font-weight:800; line-height:1.28; max-width:17ch; }
+.hero .hero-lead{ color:var(--ink-soft); font-size:.97rem; line-height:1.7; max-width:36ch; margin:0; }
+.hero .btn.primary{ padding:15px 34px; font-size:1.04rem; }
+.hero-note{ font-size:.79rem; color:var(--ink-faint); }
+.hero .hero-steps{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center;
   font-size:.82rem; color:var(--ink-faint); margin-top:2px; }
 .hero .hero-steps span{ display:flex; align-items:center; gap:6px; }
 .teacher{ display:flex; align-items:center; gap:11px; padding-top:16px; margin-top:4px;
@@ -311,29 +326,14 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 .teacher .tt{ text-align:start; line-height:1.35; }
 .teacher .tt b{ font-size:.94rem; font-weight:700; }
 .teacher .tt span{ display:block; font-size:.8rem; color:var(--ink-soft); }
+@media (max-width:420px){
+  .hero h2{ font-size:1.46rem; }
+  .hero .hero-lead{ font-size:.92rem; }
+}
 
 .dor-photo{ width:64px; height:64px; border-radius:50%; flex:none; object-fit:cover;
   transform:scale(1.05); box-shadow:0 6px 18px -8px rgba(36,28,44,.5); background:#F2C94C; }
 .dor-photo.small{ width:46px; height:46px; }
-
-/* ---------- Peek at the rest of the work ---------- */
-.peek{ padding:20px 20px 18px; margin-top:18px; }
-.peek h3{ font-size:1.06rem; margin-bottom:6px; }
-.peek .peek-sub{ color:var(--ink-soft); font-size:.87rem; line-height:1.6; margin:0 0 13px; }
-.peek ul{ list-style:none; margin:0 0 15px; padding:0; }
-.peek li{ display:flex; align-items:center; gap:9px; padding:9px 0;
-  border-bottom:1px dashed var(--line); font-size:.92rem; font-weight:500; }
-.peek li:last-child{ border-bottom:none; }
-.peek li::before{ content:"🔒"; font-size:.82rem; opacity:.55; flex:none; }
-.peek .peek-foot{ display:flex; justify-content:center; }
-
-/* ---------- What happens in a first lesson ---------- */
-.first-lesson{ width:100%; text-align:start; background:var(--surface); border:1px solid var(--line);
-  border-radius:15px; padding:15px 17px; }
-.first-lesson b{ display:block; font-size:.92rem; margin-bottom:7px; font-family:"Rubik",sans-serif; }
-.first-lesson ol{ margin:0; padding-inline-start:1.15em; font-size:.87rem; line-height:1.75; color:var(--ink-soft); }
-.rc-gap{ font-size:.92rem; line-height:1.7; color:var(--ink); max-width:44ch; margin:0;
-  padding:12px 15px; border-radius:14px; background:var(--gold-soft); border:1px solid var(--gold); }
 
 /* ---------- WhatsApp buttons ---------- */
 .wa-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px;
@@ -472,9 +472,43 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 
     <!-- landing hero: what a first-time visitor sees -->
     <div class="card hero" id="heroCard" hidden>
+      <svg class="hero-art" viewBox="0 0 260 120" role="img" aria-label="גלי קול ותווים">
+        <defs>
+          <linearGradient id="artGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FF7A59"/>
+            <stop offset="50%" stop-color="#E0468C"/>
+            <stop offset="100%" stop-color="#7C5CE0"/>
+          </linearGradient>
+          <linearGradient id="artGrad2" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#0E9E8C"/>
+            <stop offset="100%" stop-color="#2FB6C8"/>
+          </linearGradient>
+        </defs>
+        <circle cx="130" cy="62" r="52" fill="url(#artGrad)" opacity=".10"/>
+        <g class="hero-bars" fill="url(#artGrad2)">
+          <rect x="62"  y="52" width="9" height="22" rx="4.5"/>
+          <rect x="79"  y="40" width="9" height="46" rx="4.5"/>
+          <rect x="96"  y="28" width="9" height="70" rx="4.5"/>
+          <rect x="113" y="44" width="9" height="38" rx="4.5"/>
+          <rect x="130" y="20" width="9" height="86" rx="4.5"/>
+          <rect x="147" y="44" width="9" height="38" rx="4.5"/>
+          <rect x="164" y="32" width="9" height="62" rx="4.5"/>
+          <rect x="181" y="46" width="9" height="34" rx="4.5"/>
+        </g>
+        <g fill="url(#artGrad)">
+          <circle cx="36" cy="86" r="9"/>
+          <rect x="43" y="46" width="3.4" height="42" rx="1.7"/>
+          <path d="M46.4 46c9 2 14 6 14 13 0-11-5-15-14-17z"/>
+          <circle cx="212" cy="36" r="6.5"/>
+          <rect x="217" y="8" width="2.6" height="30" rx="1.3"/>
+        </g>
+      </svg>
+
+      <div class="hero-welcome">ברוכים הבאים</div>
       <h2>בכמה דקות תגלה/י מה הקול שלך צריך</h2>
-      <p class="hero-lead">שיר/י סולם קצר למיקרופון, וקבל/י אבחון אישי של מה שקורה בקול שלך — ואילו תרגילים מתאימים לך דווקא עכשיו.</p>
-      <button class="btn primary" id="heroStartBtn">מתחילים במבחן הקולי</button>
+      <p class="hero-lead">רוב האנשים מתאמנים שנים על הדבר הלא נכון — פשוט כי אף אחד מעולם לא אמר להם מה בדיוק עוצר את הקול שלהם. דקה אחת של שירה למיקרופון, ואת/ה יודע/ת.</p>
+      <button class="btn primary" id="heroStartBtn">בואו נתחיל</button>
+      <div class="hero-note">בלי הרשמה · בלי התחייבות · התוצאה מיידית</div>
       <div class="hero-steps">
         <span>🎤 דקה של שירה</span>
         <span>📊 אבחון מיידי</span>
@@ -2176,10 +2210,15 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     if (remember){ try { localStorage.setItem(HERO_KEY, '1'); } catch(e){} }
     syncTabsVisibility();
   }
+  // מסך אחד וכפתור אחד: כל עוד מסך הפתיחה גלוי, כרטיס המבחן
+  // והלשוניות מוסתרים, כדי שלא יהיו שני כפתורי התחלה על המסך
   function syncTabsVisibility(){
     var hero = document.getElementById('heroCard');
+    var showingHero = !!(hero && !hero.hidden);
     var nav = document.querySelector('nav.tabs');
-    if (nav) nav.hidden = !!(hero && !hero.hidden);
+    var card = document.getElementById('assessCard');
+    if (nav) nav.hidden = showingHero;
+    if (card) card.hidden = showingHero;
   }
   function bootHero(){
     var seen = false;
@@ -2192,7 +2231,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   document.getElementById('heroStartBtn').addEventListener('click', function(){
     hideHero(true);
     var card = document.getElementById('assessCard');
-    if (card) card.scrollIntoView({ behavior:'smooth', block:'start' });
+    if (card) card.scrollIntoView({ behavior:'smooth', block:'center' });
     var first = document.querySelector('#genderRow .choice');
     if (first) first.focus();
   });
