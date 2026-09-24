@@ -280,6 +280,14 @@ table.notes-table tr:last-child td{ border-bottom:none; }
 .ref-note-row label{ font-size:.86rem; color:var(--ink-soft); }
 select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:11px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); }
 
+.side-controls{ display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  justify-content:center; margin-top:-2px; }
+.side-controls .sc-sep{ color:var(--ink-faint); font-size:.8rem; }
+.btn-link{ background:none; border:none; padding:2px 4px; cursor:pointer;
+  font-family:inherit; font-size:.8rem; color:var(--ink-soft);
+  text-decoration:underline; text-underline-offset:3px; }
+.btn-link:hover{ color:var(--accent); }
+
 /* ---------- Plain-language summary ---------- */
 .plain-summary{ width:100%; background:var(--accent-soft); border:1px solid var(--accent);
   border-radius:18px; padding:20px 20px 18px; margin-bottom:6px; text-align:start; }
@@ -558,8 +566,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
       <!-- stage: intro -->
       <div id="stageIntro" class="test-stage">
         <div class="assess-head">
-          <h2>🎤 כעת נבצע מבחן קצר לקול</h2>
-          <p>יש לשיר את הסולם שיושמע, על הגיית "אָה" (AH)</p>
+          <h2>🎤 מבחן קולי קצר</h2>
+          <p><b>איך זה עובד:</b> מושמע לך סולם קצר של שמונה תווים. כשהוא נגמר — שיר/י אותו בחזרה על ההגייה "אָה", <b>באותו גובה בדיוק</b>. אחרי כל סולם עולים חצי טון, וממשיכים עד שקשה לך. אז לוחצים "הגעתי לגבול".</p>
+          <p style="margin-top:10px;"><b>מה זה בודק:</b> איך הקול שלך עובד — האם בורח בו יותר מדי אוויר, האם הוא נדחף בלחץ, וכמה גבוה הוא מגיע בנוחות. מהתוצאה נבנית תוכנית התרגילים שלך.</p>
         </div>
         <div class="choice-row" id="genderRow">
           <button class="choice" data-gender="male">זכר</button>
@@ -587,6 +596,14 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
         <div class="test-instruction" id="testInstruction">הקשב/י לצליל</div>
         <div class="level-bar"><div class="level-fill" id="levelFill"></div></div>
         <div class="live-badge waiting" id="liveHeard">ממתין לקול…</div>
+        <p class="notice" id="octaveNote" hidden></p>
+        <div class="resume-bar" id="testRetryBar" hidden>
+          <p id="testRetryMsg"></p>
+          <div class="controls">
+            <button class="btn primary small" id="testRetryBtn">🔁 לנסות את הסולם הזה שוב</button>
+            <button class="btn ghost small" id="testGiveUpBtn">לסיים כאן</button>
+          </div>
+        </div>
         <div class="resume-bar" id="testResumeBar" hidden>
           <p><b>המבחן הושהה כשהמסך נכבה.</b><br>מה שהספקת לשיר נשמר. אפשר להמשיך מהסולם שנעצר.</p>
           <button class="btn primary small" id="testResumeBtn">המשך/י מהנקודה שנעצרה</button>
@@ -594,6 +611,11 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
         <div class="controls">
           <button class="btn small" id="stopEarlyBtn">✋ הגעתי לגבול — סיים/י כאן</button>
           <button class="btn ghost small" id="abortTestBtn">ביטול</button>
+        </div>
+        <div class="side-controls">
+          <button class="btn-link" id="tooHighBtn">הסולם גבוה לי · נמוך/י אוקטבה</button>
+          <span class="sc-sep">·</span>
+          <button class="btn-link" id="tooLowBtn">הסולם נמוך לי · גבוה/י אוקטבה</button>
         </div>
       </div>
 
@@ -1512,6 +1534,30 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     testHint.style.color=''; testHint.textContent='המבחן בוטל.';
   });
 
+  // שינוי אוקטבה ידני, למי שהסולם פשוט לא יושב לו בטווח
+  function shiftOctave(semitones){
+    if (!testInProgress) return;
+    var next = octaveShift + semitones;
+    if (next < -12 || next > 12) return;
+    octaveShift = next;
+    octaveRetries = 0;
+    if (activeInterval){ clearInterval(activeInterval); activeInterval = null; }
+    activeRound = null;
+    clearTestTimers(); stopAllTones();
+    var note = document.getElementById('octaveNote');
+    note.hidden = false;
+    note.innerHTML = (semitones < 0
+      ? '🎵 <b>הורדנו אוקטבה.</b> '
+      : '🎵 <b>העלינו אוקטבה.</b> ')
+      + 'הקשב/י לסולם החדש ושיר/י אותו בדיוק באותו גובה.';
+    document.getElementById('testPhase').textContent = 'מנגנים מחדש…';
+    document.getElementById('testInstruction').textContent = '';
+    document.getElementById('levelFill').style.width = '0%';
+    later(function(){ runScales(currentTestIdx); }, 1400);
+  }
+  document.getElementById('tooHighBtn').addEventListener('click', function(){ shiftOctave(-12); });
+  document.getElementById('tooLowBtn').addEventListener('click', function(){ shiftOctave(12); });
+
   document.getElementById('stopEarlyBtn').addEventListener('click', function(){
     testInProgress = false; releaseWakeLock(); pausedRun = null; skipPlayback = null;
     document.getElementById('testResumeBar').hidden = true;
@@ -1539,7 +1585,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
                       micCheckBox.hidden=true; micCheckBtn.textContent='🎙️ בדיקת מיקרופון'; }
     testHint.style.color=''; testHint.textContent='מבקש הרשאת מיקרופון…';
     ensureMic().then(function(){
-      testAbort = false; testResults = []; silentStreak = 0;
+      testAbort = false; testResults = []; silentStreak = 0; octaveRetries = 0; octaveShift = 0;
+      document.getElementById('octaveNote').hidden = true;
+      document.getElementById('testRetryBar').hidden = true;
       testInProgress = true; pausedRun = null;
       document.getElementById('testResumeBar').hidden = true;
       requestWakeLock();
@@ -1554,6 +1602,39 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   });
 
   var silentStreak = 0;
+  var octaveRetries = 0;
+  var octaveShift = 0;   // הזזה ידנית של כל הסולמות, בבקשת המשתמש
+
+  // כשלא נקלט קול בסולם — לא זורקים את כל המבחן, מציעים לנסות שוב
+  function offerRetry(measure){
+    if (activeInterval){ clearInterval(activeInterval); activeInterval = null; }
+    activeRound = null;
+    clearTestTimers(); stopAllTones();
+    var bar = document.getElementById('testRetryBar');
+    document.getElementById('testRetryMsg').innerHTML = measure.silent
+      ? '<b>לא נקלט שום קול בסולם הזה.</b><br>'
+        + 'בדוק/י שהמיקרופון לא חסום ושאת/ה קרוב/ה אליו, ונסה/י שוב.'
+      : '<b>נשמע משהו, אבל לא זוהתה שירה יציבה.</b><br>'
+        + 'שיר/י "אָה" ארוך ורצוף, בעוצמה טבעית, קרוב יותר למיקרופון.';
+    bar.hidden = false;
+    document.getElementById('testPhase').textContent = '';
+    document.getElementById('testInstruction').textContent = '';
+    document.getElementById('levelFill').style.width = '0%';
+  }
+
+  document.getElementById('testRetryBtn').addEventListener('click', function(){
+    document.getElementById('testRetryBar').hidden = true;
+    silentStreak = 0;
+    ensureMic().then(function(){ runScales(currentTestIdx); }).catch(function(err){
+      testHint.style.color = 'var(--critical)'; testHint.innerHTML = micErrorText(err);
+      showStage('intro');
+    });
+  });
+
+  document.getElementById('testGiveUpBtn').addEventListener('click', function(){
+    document.getElementById('testRetryBar').hidden = true;
+    document.getElementById('stopEarlyBtn').click();
+  });
 
   function abortForSilence(measure){
     testInProgress = false; releaseWakeLock(); skipPlayback = null;
@@ -1575,14 +1656,16 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     currentTestIdx = idx;
     if (idx >= testStarts.length){ testInProgress=false; releaseWakeLock(); releaseMic(); finishTest(testResults); return; }
 
-    var start = testStarts[idx], notes = scaleFrom(start), noteDur = 0.6;
+    var start = testStarts[idx] + octaveShift, notes = scaleFrom(start), noteDur = 0.6;
     var scaleMs = notes.length*noteDur*1000;
 
     document.getElementById('testStep').textContent = 'סולם '+(idx+1)+' מתוך '+testStarts.length;
     document.getElementById('testNote').textContent = midiName(start) + ' → ' + midiName(start+12);
-    document.getElementById('testPhase').textContent = 'צליל ייחוס…';
-    document.getElementById('testInstruction').textContent = 'הקשב/י לסולם';
+    document.getElementById('testPhase').textContent = 'מקשיבים…';
+    document.getElementById('testInstruction').textContent = 'הקשב/י לסולם, ואל תשיר/י עדיין';
     document.getElementById('levelFill').style.width = '0%';
+    document.getElementById('octaveNote').hidden = true;
+    document.getElementById('testRetryBar').hidden = true;
 
     playPianoSequence(notes.map(function(m){ return noteToFreq(m); }), noteDur);
 
@@ -1591,20 +1674,41 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
       if (testAbort) return;
       skipPlayback = null;
       if (listenTimer){ clearTimeout(listenTimer); listenTimer = null; }
-      document.getElementById('testPhase').textContent = 'שיר/י עכשיו: אָה';
-      document.getElementById('testInstruction').textContent = 'על הגיית אָה, בעוצמה טבעית';
+      document.getElementById('testPhase').textContent = 'עכשיו תורך — שיר/י את הסולם';
+      document.getElementById('testInstruction').textContent =
+        'על "אָה", באותו גובה שנשמע, בעוצמה טבעית';
       collectRound(start, scaleMs + 1500 + (idx === 0 ? FIRST_ROUND_GRACE_MS : 0), function(measure){
         if (testAbort) return;
 
         // BUG-05 fix: אם לא נקלט קול, אין להמשיך ואין להמציא תוצאה
         if (!measure.voiced){
           silentStreak++;
-          // עוצרים רק כשבאמת לא נכנס שום קול. אם נשמע משהו אבל לא זוהה
-          // גובה — נותנים עוד שני סולמות לפני שמכריזים על כשל.
-          if (measure.silent || silentStreak >= 3){ abortForSilence(measure); return; }
+          // לא זורקים את המבחן. מציעים לנסות את אותו סולם שוב,
+          // כי לרוב זו בעיה רגעית של מיקרופון או של תזמון.
+          offerRetry(measure);
+          return;
         } else {
           silentStreak = 0;
         }
+
+        // שרו נכון, אבל אוקטבה מעל או מתחת לסולם שהושמע.
+        // בלי הבדיקה הזו המבחן היה מאשר סולם שלא נשר בכלל.
+        if (measure.octaveOff && octaveRetries < 2){
+          octaveRetries++;
+          var note = document.getElementById('octaveNote');
+          note.hidden = false;
+          note.innerHTML = (measure.octaveOff < 0
+            ? '😉 <b>שרת/י אוקטבה נמוכה מהסולם שהושמע.</b><br>'
+            : '😉 <b>שרת/י אוקטבה גבוהה מהסולם שהושמע.</b><br>')
+            + 'הצליל עצמו נקי, רק הגובה לא תואם. הקשב/י שוב לסולם ושיר/י '
+            + '<b>בדיוק באותו גובה</b> — לא מעל ולא מתחת. נסו שוב!';
+          document.getElementById('testPhase').textContent = 'מנגנים שוב…';
+          document.getElementById('testInstruction').textContent = '';
+          document.getElementById('levelFill').style.width = '0%';
+          later(function(){ runScales(idx); }, 2600);
+          return;
+        }
+        octaveRetries = 0;
 
         testResults.push(measure);
         document.getElementById('testPhase').textContent = 'נרשם ✓';
@@ -1712,11 +1816,23 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     });
     var avgCents = Math.round(centsSum/frames.length);
 
+    // באיזו אוקטבה שרו בפועל, לעומת הסולם שהושמע
+    var mids = frames.map(function(f){
+      var info = freqToNoteInfo(f.freq); return info ? info.midi : null;
+    }).filter(function(m){ return m !== null; }).sort(function(a,b){ return a-b; });
+    var medianMidi = mids.length ? mids[Math.floor(mids.length/2)] : null;
+    var octaveOff = 0;
+    if (medianMidi !== null){
+      var diff = medianMidi - (start + 6);      // 6 = אמצע הסולם
+      if (diff <= -8) octaveOff = -1;
+      else if (diff >= 8) octaveOff = 1;
+    }
+
     // 0..100, 50 = balanced
     var air = Math.round(100 * (0.6*norm(hf,0.015,0.16) + 0.4*(1-norm(clarity,0.55,0.97))));
     var pressure = Math.round(100 * (0.45*norm(rms,0.03,0.22) + 0.35*norm(clarity,0.75,0.99) + 0.20*norm(avgCents,0,35)));
     return { start:start, voiced:true, air:clamp(air,0,100), pressure:clamp(pressure,0,100),
-             cents:avgCents, lo:lo, hi:hi };
+             cents:avgCents, lo:lo, hi:hi, octaveOff:octaveOff, medianMidi:medianMidi };
   }
 
   function finishTest(results){
