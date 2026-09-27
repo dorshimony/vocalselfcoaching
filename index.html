@@ -1335,8 +1335,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     hf.Q.value = 0.7;
     var hg = ctx.createGain();
     hg.gain.setValueAtTime(0.0001, t0);
-    hg.gain.exponentialRampToValueAtTime(0.16, t0 + 0.002);
-    hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.055);
+    // נקישה רכה. נקישה חדה נשמעת סטקטו, וכאן רוצים קו רצוף
+    hg.gain.exponentialRampToValueAtTime(0.095, t0 + 0.004);
+    hg.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.045);
     hammer.connect(hf); hf.connect(hg); hg.connect(bus);
     hammer.start(t0); hammer.stop(t0 + 0.12);
     trackOsc(hammer, hg);
@@ -1358,7 +1359,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
         var att = 0.004 + prt.n*0.0009 + k*0.0012;
         g.gain.setValueAtTime(0.0001, t0);
         g.gain.exponentialRampToValueAtTime(peak, t0 + att);
-        g.gain.exponentialRampToValueAtTime(peak*0.34, t0 + 0.16);
+        // דעיכה מרוככת: התו נשאר מלא זמן רב יותר, ומכאן הוא דועך לאט.
+        // דעיכה חדה כאן היא מה שנתן קודם תחושת סטקטו.
+        g.gain.exponentialRampToValueAtTime(peak*0.62, t0 + 0.22);
         g.gain.exponentialRampToValueAtTime(0.0001, t0 + tail);
         osc.connect(g); g.connect(bus);
         osc.start(t0);
@@ -1372,7 +1375,8 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     markAudioBusy(freqs.length * noteDur * 1000 + 800);
     freqs.forEach(function(f, i){
       toneTimers.push(setTimeout(function(){
-        playPiano(f, noteDur * 1.6, true);
+        // התו מצלצל מעבר לפעימה, כך שהוא נמשך אל התו הבא — לגאטו
+        playPiano(f, noteDur * 2.4, true);
       }, i * noteDur * 1000));
     });
   }
@@ -1443,7 +1447,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   function playSequence(freqs,noteDur){
     markAudioBusy(freqs.length*noteDur*1000);
     freqs.forEach(function(f,i){
-      toneTimers.push(setTimeout(function(){ playPiano(f,noteDur*1.4,true); }, i*noteDur*1000));
+      toneTimers.push(setTimeout(function(){ playPiano(f,noteDur*2.4,true); }, i*noteDur*1000));
     });
   }
   function playSiren(f0,f1,dur){
@@ -1664,7 +1668,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     currentTestIdx = idx;
     if (idx >= testStarts.length){ testInProgress=false; releaseWakeLock(); releaseMic(); finishTest(testResults); return; }
 
-    var start = testStarts[idx] + octaveShift, notes = scaleFrom(start), noteDur = 0.6;
+    var start = testStarts[idx] + octaveShift, notes = scaleFrom(start), noteDur = 0.72;
     var scaleMs = notes.length*noteDur*1000;
 
     document.getElementById('testStep').textContent = 'סולם '+(idx+1)+' מתוך '+testStarts.length;
@@ -2136,7 +2140,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
       var base = refMidi();
       if (ex.playType==='tone') playPiano(noteToFreq(base),1.6);
       else if (ex.playType==='siren') playSiren(noteToFreq(base+ex.semis[0]), noteToFreq(base+ex.semis[1]), 3);
-      else playSequence(ex.semis.map(function(s){ return noteToFreq(base+s); }), 0.45);
+      else playSequence(ex.semis.map(function(s){ return noteToFreq(base+s); }), 0.6);
     });
     // BUG-01 fix: listening to a reference tone is not practice. Only an
     // explicit "done" marks the exercise, and only once per exercise per day.
@@ -2325,7 +2329,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     var v = VOWELS[vi];
     var root = VOWEL_START[vowelGender] + round*VOWEL_STEP + vowelShift;
     var notes = VOWEL_SCALE.map(function(s){ return noteToFreq(root+s); });
-    var noteDur = 0.5, scaleMs = notes.length*noteDur*1000;
+    var noteDur = 0.72, scaleMs = notes.length*noteDur*1000;
 
     document.getElementById('vowelStep').textContent = 'הגייה ' + (vi+1) + ' מתוך ' + VOWELS.length;
     document.getElementById('vowelBig').textContent = v.he;
