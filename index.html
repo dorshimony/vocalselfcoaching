@@ -613,9 +613,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
           <button class="btn ghost small" id="abortTestBtn">ביטול</button>
         </div>
         <div class="side-controls">
-          <button class="btn-link" id="tooHighBtn">הסולם גבוה לי · נמוך/י אוקטבה</button>
+          <button class="btn-link" id="tooHighBtn">הסולם גבוה לי · תוריד טרצה</button>
           <span class="sc-sep">·</span>
-          <button class="btn-link" id="tooLowBtn">הסולם נמוך לי · גבוה/י אוקטבה</button>
+          <button class="btn-link" id="tooLowBtn">הסולם נמוך לי · תעלה טרצה</button>
         </div>
       </div>
 
@@ -777,6 +777,12 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
           <button class="btn small" id="vowelSkipBtn">הגעתי לגובה המקסימלי שלי — להגייה הבאה</button>
           <button class="btn ghost small" id="vowelAbortBtn">ביטול</button>
         </div>
+        <div class="side-controls">
+          <button class="btn-link" id="vowelTooHighBtn">הסולם גבוה לי · תוריד טרצה</button>
+          <span class="sc-sep">·</span>
+          <button class="btn-link" id="vowelTooLowBtn">הסולם נמוך לי · תעלה טרצה</button>
+        </div>
+        <p class="notice" id="vowelShiftNote" hidden></p>
       </div>
 
       <div id="vowelResults" class="test-stage" hidden>
@@ -1534,7 +1540,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     testHint.style.color=''; testHint.textContent='המבחן בוטל.';
   });
 
-  // שינוי אוקטבה ידני, למי שהסולם פשוט לא יושב לו בטווח
+  // הזזה ידנית של הסולם, למי שהוא פשוט לא יושב לו בטווח.
+  // טרצה בכל לחיצה — קפיצה של אוקטבה שלמה הייתה גסה מדי.
+  var THIRD = 4;
   function shiftOctave(semitones){
     if (!testInProgress) return;
     var next = octaveShift + semitones;
@@ -1547,16 +1555,16 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     var note = document.getElementById('octaveNote');
     note.hidden = false;
     note.innerHTML = (semitones < 0
-      ? '🎵 <b>הורדנו אוקטבה.</b> '
-      : '🎵 <b>העלינו אוקטבה.</b> ')
+      ? '🎵 <b>הורדנו טרצה.</b> '
+      : '🎵 <b>העלינו טרצה.</b> ')
       + 'הקשב/י לסולם החדש ושיר/י אותו בדיוק באותו גובה.';
     document.getElementById('testPhase').textContent = 'מנגנים מחדש…';
     document.getElementById('testInstruction').textContent = '';
     document.getElementById('levelFill').style.width = '0%';
     later(function(){ runScales(currentTestIdx); }, 1400);
   }
-  document.getElementById('tooHighBtn').addEventListener('click', function(){ shiftOctave(-12); });
-  document.getElementById('tooLowBtn').addEventListener('click', function(){ shiftOctave(12); });
+  document.getElementById('tooHighBtn').addEventListener('click', function(){ shiftOctave(-THIRD); });
+  document.getElementById('tooLowBtn').addEventListener('click', function(){ shiftOctave(THIRD); });
 
   document.getElementById('stopEarlyBtn').addEventListener('click', function(){
     testInProgress = false; releaseWakeLock(); pausedRun = null; skipPlayback = null;
@@ -2198,6 +2206,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   var V_KEY = 'vsc_vowels_v2';
   var vowelData = null, vowelGender = null, vowelAbort = false;
   var vowelInProgress = false, currentVowelVi = 0, currentVowelRound = 0;
+  var vowelShift = 0;   // הזזה ידנית של הסולם, בטרצות
   var vowelFrames = {}, vowelStopVowel = false;
 
   // how many harmonics stand clear above the spectrum, plus ring & noise shares
@@ -2262,12 +2271,33 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   });
   document.getElementById('vowelSkipBtn').addEventListener('click', function(){ vowelStopVowel = true; });
 
+  // אותה הזזה בטרצה גם כאן, למי שהסולם לא יושב לו בטווח
+  function shiftVowelScale(semitones){
+    if (!vowelInProgress) return;
+    var next = vowelShift + semitones;
+    if (next < -12 || next > 12) return;
+    vowelShift = next;
+    if (activeInterval){ clearInterval(activeInterval); activeInterval = null; }
+    clearTestTimers(); stopAllTones();
+    var note = document.getElementById('vowelShiftNote');
+    note.hidden = false;
+    note.innerHTML = (semitones < 0 ? '🎵 <b>הורדנו טרצה.</b> ' : '🎵 <b>העלינו טרצה.</b> ')
+      + 'הקשב/י לסולם החדש ושיר/י אותו באותו גובה.';
+    document.getElementById('vowelPhase').textContent = 'מנגנים מחדש…';
+    document.getElementById('vowelInstruction').textContent = '';
+    document.getElementById('vowelLevel').style.width = '0%';
+    later(function(){ runVowel(currentVowelVi, currentVowelRound); }, 1400);
+  }
+  document.getElementById('vowelTooHighBtn').addEventListener('click', function(){ shiftVowelScale(-4); });
+  document.getElementById('vowelTooLowBtn').addEventListener('click', function(){ shiftVowelScale(4); });
+
   startVowelBtn.addEventListener('click', function(){
     ensureAudioCtx();   // must happen inside the tap on iOS
     vowelHint.style.color=''; vowelHint.textContent='מבקש הרשאת מיקרופון…';
     ensureMic().then(function(){
       vowelAbort=false; vowelStopVowel=false; vowelFrames={}; vowelSilentStreak=0;
-      vowelInProgress = true; pausedRun = null;
+      vowelInProgress = true; pausedRun = null; vowelShift = 0;
+      document.getElementById('vowelShiftNote').hidden = true;
       document.getElementById('vowelResumeBar').hidden = true;
       requestWakeLock();
       voiceGenderShift = (vowelGender === 'female') ? 1.12 : 1;
@@ -2293,14 +2323,15 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     }
 
     var v = VOWELS[vi];
-    var root = VOWEL_START[vowelGender] + round*VOWEL_STEP;
+    var root = VOWEL_START[vowelGender] + round*VOWEL_STEP + vowelShift;
     var notes = VOWEL_SCALE.map(function(s){ return noteToFreq(root+s); });
     var noteDur = 0.5, scaleMs = notes.length*noteDur*1000;
 
     document.getElementById('vowelStep').textContent = 'הגייה ' + (vi+1) + ' מתוך ' + VOWELS.length;
     document.getElementById('vowelBig').textContent = v.he;
-    document.getElementById('vowelPhase').textContent = 'צליל ייחוס…';
-    document.getElementById('vowelInstruction').textContent = 'הקשב/י לסולם';
+    document.getElementById('vowelPhase').textContent = 'מקשיבים…';
+    document.getElementById('vowelInstruction').textContent = 'הקשב/י לסולם, ואל תשיר/י עדיין';
+    document.getElementById('vowelShiftNote').hidden = true;
     document.getElementById('vowelLevel').style.width = '0%';
 
     playPianoSequence(notes, noteDur);
