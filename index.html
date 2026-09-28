@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#0E9E8C" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1C1729" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#131020" media="(prefers-color-scheme: dark)">
 <style>html{-webkit-text-size-adjust:100%}</style>
 <title>VocalSelfCoaching</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +40,17 @@
   --shadow: 0 1px 2px rgba(36,28,44,.05), 0 10px 30px -14px rgba(36,28,44,.22);
   --shadow-lift: 0 2px 4px rgba(36,28,44,.06), 0 22px 44px -20px rgba(124,92,224,.38);
   --radius: 20px;
-  /* במחשב: בהיר תמיד. בטלפון במצב כהה: הערכה הכהה שלמטה */
-  color-scheme: only light;
+  /* מצהירים שהעמוד יודע לטפל בעצמו גם בבהיר וגם בכהה.
+     בלי ההצהרה הזו, דפדפנים בטלפון (כרום, סמסונג אינטרנט) מפעילים
+     "כהה כפוי" — הופכים את הצבעים בעצמם, ומקבלים חום־אדום מרוסק.
+     עם ההצהרה הם מרימים ידיים ונותנים לעיצוב שלנו לעבוד. */
+  color-scheme: light dark;
+}
+
+/* במחשב נשאר בהיר תמיד, גם אם המערכת במצב כהה.
+   pointer:fine = עכבר, כלומר מחשב. */
+@media (prefers-color-scheme: dark) and (pointer: fine){
+  :root{ color-scheme: light; }
 }
 
 /* הערכה הכהה נכנסת רק במכשירי מגע (טלפון או טאבלט) שנמצאים במצב כהה.
@@ -50,16 +59,18 @@
 @media (prefers-color-scheme: dark) and (pointer: coarse){
   :root{
     color-scheme: dark;
-    --paper:#1C1729;
-    --surface:#272036;
-    --surface-2:#332B47;
-    --ink:#F6F2FA;
-    --ink-soft:#BFB5CC;
-    --ink-faint:#8B8099;
-    --line:#40375580;
-    --accent:#3FE0C4;
-    --accent-ink:#06201C;
-    --accent-soft:#1B3D37;
+    /* רקע עמוק יותר מהכרטיסים, כדי שכרטיס ייראה כמו כרטיס
+       ולא כמו כתם על הרקע */
+    --paper:#131020;
+    --surface:#1F1933;
+    --surface-2:#2B2346;
+    --ink:#F7F4FC;
+    --ink-soft:#C6BCD8;
+    --ink-faint:#8F84A6;
+    --line:#443A60A0;
+    --accent:#45E8CB;
+    --accent-ink:#04211C;
+    --accent-soft:#163D35;
     --coral:#FF9B7F;
     --coral-soft:#402A26;
     --violet:#B9A2FF;
@@ -72,16 +83,16 @@
     --warn-soft:#42351C;
     --critical:#FF8878;
     --critical-soft:#432421;
-    --shadow: 0 1px 2px rgba(0,0,0,.45), 0 14px 34px -16px rgba(0,0,0,.7);
-    --shadow-lift: 0 2px 6px rgba(0,0,0,.45), 0 26px 50px -22px rgba(185,162,255,.28);
+    --shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 16px 38px -18px rgba(0,0,0,.85);
+    --shadow-lift: 0 1px 0 rgba(255,255,255,.06) inset, 0 28px 56px -24px rgba(185,162,255,.32);
   }
   nav.tabs button:hover{ background:rgba(255,255,255,.07); }
   header.top{ box-shadow:0 10px 26px -22px rgba(0,0,0,.9); }
   body::before{
     background:
-      radial-gradient(46rem 30rem at 88% -6%, rgba(255,122,89,.17), transparent 62%),
-      radial-gradient(40rem 28rem at 6% 4%, rgba(124,92,224,.20), transparent 64%),
-      radial-gradient(38rem 30rem at 50% 108%, rgba(14,158,140,.14), transparent 66%);
+      radial-gradient(46rem 30rem at 88% -6%, rgba(255,122,89,.20), transparent 62%),
+      radial-gradient(40rem 28rem at 6% 4%, rgba(124,92,224,.26), transparent 64%),
+      radial-gradient(38rem 30rem at 50% 108%, rgba(14,158,140,.17), transparent 66%);
   }
 }
 
@@ -613,9 +624,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
           <button class="btn ghost small" id="abortTestBtn">ביטול</button>
         </div>
         <div class="side-controls">
-          <button class="btn-link" id="tooHighBtn">הסולם גבוה לי · תוריד טרצה</button>
+          <button class="btn-link" id="tooHighBtn">הסולם גבוה לי · תוריד את הטון</button>
           <span class="sc-sep">·</span>
-          <button class="btn-link" id="tooLowBtn">הסולם נמוך לי · תעלה טרצה</button>
+          <button class="btn-link" id="tooLowBtn">הסולם נמוך לי · תעלה את הטון</button>
         </div>
       </div>
 
@@ -778,9 +789,9 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
           <button class="btn ghost small" id="vowelAbortBtn">ביטול</button>
         </div>
         <div class="side-controls">
-          <button class="btn-link" id="vowelTooHighBtn">הסולם גבוה לי · תוריד טרצה</button>
+          <button class="btn-link" id="vowelTooHighBtn">הסולם גבוה לי · תוריד את הטון</button>
           <span class="sc-sep">·</span>
-          <button class="btn-link" id="vowelTooLowBtn">הסולם נמוך לי · תעלה טרצה</button>
+          <button class="btn-link" id="vowelTooLowBtn">הסולם נמוך לי · תעלה את הטון</button>
         </div>
         <p class="notice" id="vowelShiftNote" hidden></p>
       </div>
@@ -1559,8 +1570,8 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     var note = document.getElementById('octaveNote');
     note.hidden = false;
     note.innerHTML = (semitones < 0
-      ? '🎵 <b>הורדנו טרצה.</b> '
-      : '🎵 <b>העלינו טרצה.</b> ')
+      ? '🎵 <b>הורדנו את הטון.</b> '
+      : '🎵 <b>העלינו את הטון.</b> ')
       + 'הקשב/י לסולם החדש ושיר/י אותו בדיוק באותו גובה.';
     document.getElementById('testPhase').textContent = 'מנגנים מחדש…';
     document.getElementById('testInstruction').textContent = '';
@@ -2285,7 +2296,7 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
     clearTestTimers(); stopAllTones();
     var note = document.getElementById('vowelShiftNote');
     note.hidden = false;
-    note.innerHTML = (semitones < 0 ? '🎵 <b>הורדנו טרצה.</b> ' : '🎵 <b>העלינו טרצה.</b> ')
+    note.innerHTML = (semitones < 0 ? '🎵 <b>הורדנו את הטון.</b> ' : '🎵 <b>העלינו את הטון.</b> ')
       + 'הקשב/י לסולם החדש ושיר/י אותו באותו גובה.';
     document.getElementById('vowelPhase').textContent = 'מנגנים מחדש…';
     document.getElementById('vowelInstruction').textContent = '';
