@@ -89,6 +89,7 @@
       radial-gradient(40rem 28rem at 6% 4%, rgba(124,92,224,.26), transparent 64%),
       radial-gradient(38rem 30rem at 50% 108%, rgba(14,158,140,.17), transparent 66%);
   }
+
 }
 
 *{ box-sizing:border-box; }
@@ -469,6 +470,50 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
 @media (max-width:520px){
   .stat-tile{ padding:12px 6px; } .stat-tile .val{ font-size:1.3rem; }
   .brand .sub{ border:none; padding:0; width:100%; }
+}
+
+/* ============================================================
+   ליטוש המצב הכהה בטלפון.
+   הבלוק הזה יושב בסוף הגיליון בכוונה: כללי CSS באותה רמת
+   ספציפיות נקבעים לפי סדר, וכלל שמופיע מאוחר יותר מנצח.
+   כשהליטוש ישב למעלה, כל העיצוב הרגיל שמתחתיו דרס אותו.
+   ============================================================ */
+@media (prefers-color-scheme: dark) and (pointer: coarse){
+
+  /* כרטיס מזכוכית: שיפוע מלמעלה למטה במקום משטח שטוח,
+     כדי שלכרטיס יהיה נפח ולא ייראה כמו מלבן שטוח */
+  .card{
+    background:linear-gradient(180deg,#282041 0%, #1D1733 62%, #1A1530 100%);
+    border-color:#453A6699;
+  }
+  .card::after{ opacity:1; height:2px; }
+
+  /* הלשונית הפעילה מקבלת הילת מנטה, שהעין תמצא אותה מיד */
+  nav.tabs{ background:#1A1530B3; border:1px solid #3A305480; }
+  nav.tabs button.active{ box-shadow:0 0 0 1px #45E8CB40, 0 10px 24px -10px #45E8CB66; }
+
+  /* כפתור ראשי: הצללה צבעונית במקום שחורה */
+  .btn.primary{ box-shadow:0 12px 28px -12px #45E8CB80; }
+  .btn:disabled{ opacity:.32; box-shadow:none; }
+
+  /* כפתור משני: מסגרת שרואים, במקום כזו שנבלעת ברקע */
+  .btn{ background:#2A2246A6; border-color:#4E4272; }
+  .btn.ghost{ background:transparent; }
+
+  /* שדות טופס — היו כמעט בלתי נראים על הרקע הכהה */
+  input, textarea, select{
+    background:#171226; border:1px solid #4E4272; color:var(--ink);
+  }
+  input::placeholder, textarea::placeholder{ color:#82778F; }
+  input:focus, textarea:focus, select:focus{
+    border-color:#45E8CB; outline:none; box-shadow:0 0 0 3px #45E8CB26;
+  }
+
+  /* וואטסאפ: ירוק שיושב עם הפלטה במקום לצרוח ממנה */
+  .wa-btn{
+    background:linear-gradient(135deg,#27B573 0%, #17A08C 100%);
+    box-shadow:0 14px 32px -18px #27B573A6;
+  }
 }
 </style>
 </head>
