@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#0E9E8C" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131020" media="(prefers-color-scheme: dark)">
 <style>html{-webkit-text-size-adjust:100%}</style>
@@ -40,17 +39,12 @@
   --shadow: 0 1px 2px rgba(36,28,44,.05), 0 10px 30px -14px rgba(36,28,44,.22);
   --shadow-lift: 0 2px 4px rgba(36,28,44,.06), 0 22px 44px -20px rgba(124,92,224,.38);
   --radius: 20px;
-  /* מצהירים שהעמוד יודע לטפל בעצמו גם בבהיר וגם בכהה.
-     בלי ההצהרה הזו, דפדפנים בטלפון (כרום, סמסונג אינטרנט) מפעילים
-     "כהה כפוי" — הופכים את הצבעים בעצמם, ומקבלים חום־אדום מרוסק.
-     עם ההצהרה הם מרימים ידיים ונותנים לעיצוב שלנו לעבוד. */
-  color-scheme: light dark;
-}
-
-/* במחשב נשאר בהיר תמיד, גם אם המערכת במצב כהה.
-   pointer:fine = עכבר, כלומר מחשב. */
-@media (prefers-color-scheme: dark) and (pointer: fine){
-  :root{ color-scheme: light; }
+  /* המילה only היא הקריטית כאן.
+     "light" לבדה רק אומרת לדפדפן איזה גוון אנחנו מעדיפים, והוא עדיין
+     רשאי להפעיל "כהה אוטומטי" ולהפוך לנו את הצבעים בעצמו — משם הגיע
+     החום־אדום. "only light" אומרת לו במפורש: אל תיגע, אני מטפל בזה.
+     בערכה הכהה שלמטה מופיע במקביל only dark, מאותה סיבה בדיוק. */
+  color-scheme: only light;
 }
 
 /* הערכה הכהה נכנסת רק במכשירי מגע (טלפון או טאבלט) שנמצאים במצב כהה.
@@ -58,7 +52,8 @@
    לא נכנס לפעולה והעיצוב הבהיר נשאר. */
 @media (prefers-color-scheme: dark) and (pointer: coarse){
   :root{
-    color-scheme: dark;
+    /* only dark = "אני כהה בעצמי, אל תחיל עליי כהה אוטומטי" */
+    color-scheme: only dark;
     /* רקע עמוק יותר מהכרטיסים, כדי שכרטיס ייראה כמו כרטיס
        ולא כמו כתם על הרקע */
     --paper:#131020;
