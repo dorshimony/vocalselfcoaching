@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E9E8C" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#131020" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0A1320" media="(prefers-color-scheme: dark)">
 <style>html{-webkit-text-size-adjust:100%}</style>
 <title>VocalSelfCoaching</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,42 +54,44 @@
   :root{
     /* only dark = "אני כהה בעצמי, אל תחיל עליי כהה אוטומטי" */
     color-scheme: only dark;
-    /* רקע עמוק יותר מהכרטיסים, כדי שכרטיס ייראה כמו כרטיס
-       ולא כמו כתם על הרקע */
-    --paper:#131020;
-    --surface:#1F1933;
-    --surface-2:#2B2346;
-    --ink:#F7F4FC;
-    --ink-soft:#C6BCD8;
-    --ink-faint:#8F84A6;
-    --line:#443A60A0;
-    --accent:#45E8CB;
-    --accent-ink:#04211C;
-    --accent-soft:#163D35;
+    /* ערכה B — כחול לילי וטורקיז.
+       הרקע עמוק יותר מהכרטיסים, כדי שכרטיס ייראה כמו כרטיס
+       ולא כמו כתם על הרקע. */
+    --paper:#0A1320;
+    --surface:#122033;
+    --surface-2:#1B2D45;
+    --ink:#EAF2FB;
+    --ink-soft:#A8BDD4;
+    --ink-faint:#6F87A3;
+    --line:#2A4260;
+    --accent:#38D6F0;
+    --accent-ink:#04212A;
+    --accent-soft:#0E3340;
     --coral:#FF9B7F;
-    --coral-soft:#402A26;
-    --violet:#B9A2FF;
-    --violet-soft:#332A52;
+    --coral-soft:#3A2520;
+    --violet:#A79BFF;
+    --violet-soft:#252648;
     --gold:#F5CC6D;
-    --gold-soft:#42351C;
-    --good:#55DE9B;
-    --good-soft:#173826;
+    --gold-soft:#3A3018;
+    --good:#4FD8A4;
+    --good-soft:#0F3A2C;
     --warn:#F5CC6D;
-    --warn-soft:#42351C;
+    --warn-soft:#3A3018;
     --critical:#FF8878;
-    --critical-soft:#432421;
+    --critical-soft:#3E211D;
+    --grad: linear-gradient(135deg,#38D6F0 0%,#4A8CF7 55%,#8B7BF7 100%);
+    --grad-cool: linear-gradient(135deg,#38D6F0 0%,#4A8CF7 100%);
     --shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 16px 38px -18px rgba(0,0,0,.85);
-    --shadow-lift: 0 1px 0 rgba(255,255,255,.06) inset, 0 28px 56px -24px rgba(185,162,255,.32);
+    --shadow-lift: 0 1px 0 rgba(255,255,255,.06) inset, 0 28px 56px -24px rgba(56,214,240,.30);
   }
   nav.tabs button:hover{ background:rgba(255,255,255,.07); }
   header.top{ box-shadow:0 10px 26px -22px rgba(0,0,0,.9); }
   body::before{
     background:
-      radial-gradient(46rem 30rem at 88% -6%, rgba(255,122,89,.20), transparent 62%),
-      radial-gradient(40rem 28rem at 6% 4%, rgba(124,92,224,.26), transparent 64%),
-      radial-gradient(38rem 30rem at 50% 108%, rgba(14,158,140,.17), transparent 66%);
+      radial-gradient(46rem 30rem at 88% -6%, rgba(56,214,240,.12), transparent 62%),
+      radial-gradient(40rem 28rem at 6% 4%, rgba(74,140,247,.14), transparent 64%),
+      radial-gradient(38rem 30rem at 50% 108%, rgba(139,123,247,.10), transparent 66%);
   }
-
 }
 
 *{ box-sizing:border-box; }
@@ -483,36 +485,36 @@ select{ font-family:inherit; font-size:.89rem; padding:7px 11px; border-radius:1
   /* כרטיס מזכוכית: שיפוע מלמעלה למטה במקום משטח שטוח,
      כדי שלכרטיס יהיה נפח ולא ייראה כמו מלבן שטוח */
   .card{
-    background:linear-gradient(180deg,#282041 0%, #1D1733 62%, #1A1530 100%);
-    border-color:#453A6699;
+    background:linear-gradient(180deg,#17283F 0%, #13202F 62%, #101C2D 100%);
+    border-color:#2E4A6B;
   }
   .card::after{ opacity:1; height:2px; }
 
-  /* הלשונית הפעילה מקבלת הילת מנטה, שהעין תמצא אותה מיד */
-  nav.tabs{ background:#1A1530B3; border:1px solid #3A305480; }
-  nav.tabs button.active{ box-shadow:0 0 0 1px #45E8CB40, 0 10px 24px -10px #45E8CB66; }
+  /* הלשונית הפעילה מקבלת הילת טורקיז, שהעין תמצא אותה מיד */
+  nav.tabs{ background:#101C2DB3; border:1px solid #2A4260; }
+  nav.tabs button.active{ box-shadow:0 0 0 1px #38D6F040, 0 10px 24px -10px #38D6F073; }
 
   /* כפתור ראשי: הצללה צבעונית במקום שחורה */
-  .btn.primary{ box-shadow:0 12px 28px -12px #45E8CB80; }
+  .btn.primary{ box-shadow:0 12px 28px -12px #38D6F08C; }
   .btn:disabled{ opacity:.32; box-shadow:none; }
 
   /* כפתור משני: מסגרת שרואים, במקום כזו שנבלעת ברקע */
-  .btn{ background:#2A2246A6; border-color:#4E4272; }
+  .btn{ background:#1B2D45A6; border-color:#34517A; }
   .btn.ghost{ background:transparent; }
 
   /* שדות טופס — היו כמעט בלתי נראים על הרקע הכהה */
   input, textarea, select{
-    background:#171226; border:1px solid #4E4272; color:var(--ink);
+    background:#081020; border:1px solid #34517A; color:var(--ink);
   }
-  input::placeholder, textarea::placeholder{ color:#82778F; }
+  input::placeholder, textarea::placeholder{ color:#6F87A3; }
   input:focus, textarea:focus, select:focus{
-    border-color:#45E8CB; outline:none; box-shadow:0 0 0 3px #45E8CB26;
+    border-color:#38D6F0; outline:none; box-shadow:0 0 0 3px #38D6F02E;
   }
 
   /* וואטסאפ: ירוק שיושב עם הפלטה במקום לצרוח ממנה */
   .wa-btn{
-    background:linear-gradient(135deg,#27B573 0%, #17A08C 100%);
-    box-shadow:0 14px 32px -18px #27B573A6;
+    background:linear-gradient(135deg,#24B584 0%, #15A79B 100%);
+    box-shadow:0 14px 32px -18px #1BAE90A6;
   }
 }
 </style>
