@@ -84,6 +84,12 @@ section.view{display:flex;flex-direction:column;gap:18px}
 
 /* lists */
 .list{display:flex;flex-direction:column}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;align-items:stretch}
+.tiles>.panel{display:flex;flex-direction:column;max-height:400px;min-height:0}
+.tiles>.panel>.scroll{overflow-y:auto;min-height:0;flex:1;margin-inline-end:-6px;padding-inline-end:6px}
+.tiles .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tiles .acts .btn{justify-content:center}
+@media (max-width:420px){.tiles{grid-template-columns:1fr}}
 .item{display:flex;gap:12px;align-items:center;padding:12px 8px;margin-inline:-8px;border-radius:10px;border:0;border-bottom:1px solid var(--line2);cursor:pointer;background:none;text-align:right;width:calc(100% + 16px);transition:background .12s}
 .item:hover{background:var(--sunk)}
 .item:last-child{border-bottom:0}
@@ -520,8 +526,8 @@ function viewHome(){
   const vacs=arr(S.vacations).filter(v=>(v.to||v.from)>=t).sort((a,b)=>a.from.localeCompare(b.from));
   const remindPanel=`<div class="panel">
     <div class="spread"><h2>תזכורות לתלמידים</h2><span class="tiny muted">שיעורים של היום ומחר</span></div>
-    <div class="list">${remindList.length?remindList.map(l=>{const s=S.students[l.studentId]||{};return `<div class="item" style="cursor:default"><div class="main"><div class="t">${esc(s.name||"")}</div><div class="s">${l.date===t?"היום":"מחר"} · <span class="num">${esc(l.time||"")}</span>${l.reminderSent?" · נשלחה תזכורת":""}</div></div><div class="end">${waButton(s.phone,lessonMsg(l),l.reminderSent?"שליחה שוב":"שליחה בוואטסאפ",`data-sent="${l.id}"`)}</div></div>`}).join(""):`<div class="empty">אין שיעורים היום ומחר.</div>`}</div>
-    ${vacs.length?`<div class="list" style="gap:8px;margin-top:10px">${vacs.map(v=>`<div class="alert warn"><div style="flex:1;min-width:0"><b>${esc(v.title||"חופשה")}: ${fmtD(v.from)} עד ${fmtD(v.to||v.from)}</b><span class="tiny">${v.notified?"התלמידים עודכנו":"עוד לא עדכנת את התלמידים"}</span></div><button class="btn small" data-act="vacNotify" data-id="${v.id}">הודעה לתלמידים</button></div>`).join("")}</div>`:""}
+    <div class="scroll"><div class="list">${remindList.length?remindList.map(l=>{const s=S.students[l.studentId]||{};return `<div class="item" style="cursor:default"><div class="main"><div class="t">${esc(s.name||"")}</div><div class="s">${l.date===t?"היום":"מחר"} · <span class="num">${esc(l.time||"")}</span>${l.reminderSent?" · נשלחה תזכורת":""}</div></div><div class="end">${waButton(s.phone,lessonMsg(l),l.reminderSent?"שליחה שוב":"שליחה בוואטסאפ",`data-sent="${l.id}"`)}</div></div>`}).join(""):`<div class="empty">אין שיעורים היום ומחר.</div>`}</div>
+    ${vacs.length?`<div class="list" style="gap:8px;margin-top:10px">${vacs.map(v=>`<div class="alert warn"><div style="flex:1;min-width:0"><b>${esc(v.title||"חופשה")}: ${fmtD(v.from)} עד ${fmtD(v.to||v.from)}</b><span class="tiny">${v.notified?"התלמידים עודכנו":"עוד לא עדכנת את התלמידים"}</span></div><button class="btn small" data-act="vacNotify" data-id="${v.id}">הודעה לתלמידים</button></div>`).join("")}</div>`:""}</div>
   </div>`;
   const pr=G.payRem||[];
   const payPanel=pr.length?`<button class="paytile pulse" data-act="payRemSheet"><span><b>תזכורת לתשלום</b><span class="tiny muted" style="display:block">${pr.map(r=>r.sid?studentName(r.sid):"").filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(", ")||"מהיומן"}</span></span><span class="chip warn">${pr.length}</span></button>`:"";
@@ -534,27 +540,32 @@ function viewHome(){
     <div class="kpi" role="button" tabindex="0" data-act="toStudents" style="cursor:pointer"><div class="l">תלמידים פעילים</div><div class="v num">${arr(S.students).filter(s=>s.active!==false).length}</div><div class="tiny muted">${arr(S.students).filter(s=>s.active===false).length} לא פעילים</div></div>
   </div>
   ${splitPanel(y)}
+  <div class="tiles">
   <div class="panel">
-    <div class="spread"><h2>דורש תשומת לב</h2></div>
-    <div class="list" style="gap:8px">${al.length?al.map(a=>`<div class="alert ${a.k}"><div style="flex:1;min-width:0"><b>${esc(a.t)}</b><span class="tiny">${esc(a.s)}</span></div>${a.ypay?`<a class="btn small" href="${YPAY_URL}" target="_blank" rel="noopener">לוויי־פיי</a>`:""}${a.vac?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="vacNotify" data-id="${a.vac}">הודעה לתלמידים</button>`:""}${a.go?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="${a.go[0]}">${a.go[1]}</button>`:""}</div>`).join(""):`<div class="alert ok"><div><b>הכול מסודר</b><span class="tiny">אין חובות, תזכורות קרובות או תשלומים בלי קבלה</span></div></div>`}</div>
+    <div class="spread"><h2>דורש תשומת לב</h2>${al.length?`<span class="chip warn">${al.length}</span>`:""}</div>
+    <div class="scroll"><div class="list" style="gap:8px">${al.length?al.map(a=>`<div class="alert ${a.k}"><div style="flex:1;min-width:0"><b>${esc(a.t)}</b><span class="tiny">${esc(a.s)}</span></div>${a.ypay?`<a class="btn small" href="${YPAY_URL}" target="_blank" rel="noopener">לוויי־פיי</a>`:""}${a.vac?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="vacNotify" data-id="${a.vac}">הודעה לתלמידים</button>`:""}${a.go?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="${a.go[0]}">${a.go[1]}</button>`:""}</div>`).join(""):`<div class="alert ok"><div><b>הכול מסודר</b><span class="tiny">אין חובות, תזכורות קרובות או תשלומים בלי קבלה</span></div></div>`}</div></div>
   </div>
   ${remindPanel}
   <div class="panel">
     <div class="spread"><h2>השיעורים הקרובים</h2><button class="btn small primary" data-act="newLesson">שיעור חדש</button></div>
-    <div class="list">${upcoming.length?upcoming.map(lessonItem).join(""):`<div class="empty">אין שיעורים מתוכננים. לחץ "שיעור חדש" כדי לקבוע.</div>`}</div>
+    <div class="scroll"><div class="list">${upcoming.length?upcoming.map(lessonItem).join(""):`<div class="empty">אין שיעורים מתוכננים. לחץ "שיעור חדש" כדי לקבוע.</div>`}</div></div>
+  </div>
+  <div class="panel"><div class="spread"><h2>פעולות מהירות</h2></div>
+  <div class="acts">
+    <button class="btn" data-act="newPayment">רישום תשלום</button>
+    <span style="display:flex;gap:4px;align-items:center"><button class="btn primary" style="flex:1" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" aria-label="מה כדאי להעלות">?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span></span>
+    <button class="btn" data-act="newExpense">רישום הוצאה</button>
+    <button class="btn" data-act="newStudent">תלמיד חדש</button>
+    <button class="btn" data-act="newVacation">חופשה</button>
+    <a class="btn ghost" href="${YPAY_URL}" target="_blank" rel="noopener">הפקת קבלה בוויי־פיי</a>
+  </div>
+  </div>
   </div>
   <div class="panel" style="padding:12px">
     <div class="spread" style="margin-bottom:8px"><h2 style="margin:0">השבוע ביומן</h2><button class="btn small ghost" data-act="toCal">ליומן המלא</button></div>
     ${weekGrid(0)}
   </div>
-  <div class="row">
-    <button class="btn" data-act="newPayment">רישום תשלום</button>
-    <button class="btn primary" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" aria-label="מה כדאי להעלות">?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span>
-    <button class="btn" data-act="newExpense">רישום הוצאה</button>
-    <button class="btn" data-act="newStudent">תלמיד חדש</button>
-    <button class="btn" data-act="newVacation">חופשה</button>
-    <a class="btn ghost" href="${YPAY_URL}" target="_blank" rel="noopener">הפקת קבלה בוויי־פיי</a>
-  </div>`;
+`;
 }
 function settleInfo(l){
   if(l.paid||l.status==="cancelled")return null;
