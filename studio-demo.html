@@ -85,6 +85,7 @@ section.view{display:flex;flex-direction:column;gap:18px}
 /* lists */
 .list{display:flex;flex-direction:column}
 .item:has(.planbox){flex-wrap:wrap}
+.prevbox{padding:10px 12px;background:var(--sunk);border-radius:10px}
 .sechd{margin-top:8px;padding-top:10px;border-top:1px solid var(--line);font-weight:700;color:var(--accent);font-size:.92rem}
 .planbox{flex-basis:100%;display:flex;flex-direction:column;gap:4px;margin-top:8px;padding:8px 10px;background:var(--sunk);border-radius:10px;font-size:.88rem;line-height:1.45}
 .planbox .plk{display:inline-block;font-weight:600;color:var(--ink2);margin-inline-end:6px}
@@ -599,22 +600,35 @@ function settleSheet(id){
   });
 }
 function prevLesson(l){
-  return arr(S.lessons).filter(x=>x.studentId===l.studentId&&x.id!==l.id&&(x.status==="done"||x.status==="late")&&(x.date+(x.time||""))<(l.date+(l.time||""))).sort((a,b)=>(b.date+(b.time||"")).localeCompare(a.date+(a.time||"")))[0]||null;
+  return arr(S.lessons).filter(x=>x.studentId===l.studentId&&x.id!==l.id&&x.status!=="cancelled"&&(x.date+(x.time||""))<(l.date+(l.time||""))).sort((a,b)=>(b.date+(b.time||"")).localeCompare(a.date+(a.time||"")))[0]||null;
+}
+function planOf(l){if(l.plan)return l.plan;const p=prevLesson(l);return p?.nextPlan||""}
+function prevBox(pv){
+  if(!pv)return `<div class="prevbox"><b class="tiny">שיעור שעבר</b><div class="muted">זה השיעור הראשון שרשום</div></div>`;
+  const w=planOf(pv)||pv.topic;
+  return `<div class="prevbox"><b class="tiny">בשיעור שעבר עבדנו על · ${fmtD(pv.date)}</b><div>${w?esc(w):`<span class="muted">לא נרשם</span>`}</div></div>`;
 }
 function planBox(l){
-  const pv=prevLesson(l);
-  const last=pv?`<div class="pl"><span class="plk">שיעור שעבר · ${fmtD(pv.date)}</span>${pv.topic?esc(pv.topic):`<span class="muted">לא נרשם על מה עבדתם</span>`}${pv.homework?`<span class="muted"> · תרגול לבית: ${esc(pv.homework)}</span>`:""}</div>`:`<div class="pl"><span class="plk">שיעור שעבר</span><span class="muted">זה השיעור הראשון שרשום</span></div>`;
-  const next=l.plan?`<div class="pl"><span class="plk">נעבוד על</span>${esc(l.plan)} <button class="lnk" data-act="planLesson" data-id="${l.id}">עריכה</button></div>`:`<div class="pl"><button class="btn small" data-act="planLesson" data-id="${l.id}">+ על מה נעבוד בשיעור הזה</button></div>`;
+  const pv=prevLesson(l), pl=planOf(l), w=pv?(planOf(pv)||pv.topic):"";
+  const last=`<div class="pl"><span class="plk">שיעור שעבר${pv?" · "+fmtD(pv.date):""}</span>${pv?(w?esc(w):`<span class="muted">לא נרשם</span>`):`<span class="muted">זה השיעור הראשון שרשום</span>`}</div>`;
+  const next=pl?`<div class="pl"><span class="plk">נעבוד על</span>${esc(pl)} <button class="lnk" data-act="planLesson" data-id="${l.id}">עריכה</button></div>`:`<div class="pl"><button class="btn small" data-act="planLesson" data-id="${l.id}">+ על מה נעבוד בשיעור הזה</button></div>`;
   return `<div class="planbox">${last}${next}</div>`;
 }
+function planFields(l,px){
+  const nm=studentName(l.studentId)||"התלמיד";
+  return `<div class="sechd">לפני השיעור · על מה נעבוד</div>
+    ${prevBox(prevLesson(l))}
+    <label class="f">על מה נעבוד בשיעור הזה<textarea id="${px}_plan" placeholder="להמשיך מאיפה שעצרנו, שיר חדש, תרגילי נשימה…">${esc(planOf(l))}</textarea></label>
+    <div class="sechd">לשיעור הבא · על מה נעבוד</div>
+    <label class="f">מה להמשיך בשיעור הבא<textarea id="${px}_next" placeholder="מה שתרשום כאן יופיע אוטומטית בשיעור הבא של ${esc(nm)}">${esc(l.nextPlan||"")}</textarea></label>`;
+}
 function planSheet(id){
-  const l=S.lessons[id];if(!l)return;const pv=prevLesson(l);
+  const l=S.lessons[id];if(!l)return;
   openSheet(`<h2>${esc(studentName(l.studentId)||"")} · ${fmtD(l.date)}</h2>
-  ${pv?`<div class="panel" style="padding:12px;background:var(--sunk);border:0"><b>שיעור שעבר · ${fmtD(pv.date)}</b><div>${pv.topic?esc(pv.topic):`<span class="muted">לא נרשם על מה עבדתם</span>`}</div>${pv.homework?`<div class="tiny muted">תרגול לבית: ${esc(pv.homework)}</div>`:""}</div>`:""}
-  <label class="f">על מה נעבוד בשיעור הזה<textarea id="p_plan" placeholder="להמשיך מאיפה שעצרנו, שיר חדש, תרגילי נשימה…">${esc(l.plan||"")}</textarea></label>
+  ${planFields({...l,id},"p")}
   <div class="row"><button class="btn primary" data-save>שמירה</button><button class="btn ghost" data-close>ביטול</button></div>`,r=>{
-    r.querySelector("[data-save]").onclick=async()=>{const v=r.querySelector("#p_plan").value.trim();
-      if(await save("lessons",id,{...strip(S.lessons[id]),plan:v})===null)return;closeSheet();toast("נשמר")};
+    r.querySelector("[data-save]").onclick=async()=>{
+      if(await save("lessons",id,(()=>{const d={...strip(S.lessons[id]),plan:r.querySelector("#p_plan").value.trim(),nextPlan:r.querySelector("#p_next").value.trim()};if(d.plan&&d.plan===(prevLesson({...d,id})?.nextPlan||""))d.plan="";return d})())===null)return;closeSheet();toast("נשמר")};
     setTimeout(()=>r.querySelector("#p_plan").focus(),50);
   });
 }
@@ -1154,7 +1168,7 @@ function studentDetail(id,openTag){
   <div class="row"><button class="btn primary small" data-newlesson>שיעור חדש</button><button class="btn small" data-newpay>רישום תשלום</button>${s.active===false?`<button class="btn small" data-reactivate>החזרה לפעיל</button>`:`<button class="btn small" data-deactivate>סימון כלא פעיל</button>`}</div>
   <div id="deactBox" hidden class="list" style="gap:8px"><div class="tiny muted">למה?</div><div class="row">${["עזב","סיים את המטרה שלשמה הגיע","הפסקה זמנית","אחר"].map(r=>`<button class="btn small" data-reason="${esc(r)}">${esc(r)}</button>`).join("")}</div></div>
   <h3 style="font-size:1.05rem">התקדמות ושיעורים</h3>
-  <div class="list">${ls.length?ls.map(l=>{const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;return `<button class="item" data-lesson="${l.id}"><div class="main"><div class="t">${fmtD(l.date)} <span class="chip ${st[1]}">${st[0]}</span></div>${l.topic?`<div class="s">עבדנו על: ${esc(l.topic)}</div>`:""}${l.homework?`<div class="s">תרגול לבית: ${esc(l.homework)}</div>`:""}</div></button>`}).join(""):`<div class="empty">עוד אין שיעורים.</div>`}</div>
+  <div class="list">${ls.length?ls.map(l=>{const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;return `<button class="item" data-lesson="${l.id}"><div class="main"><div class="t">${fmtD(l.date)} <span class="chip ${st[1]}">${st[0]}</span></div>${(planOf(l)||l.topic)?`<div class="s">על מה עבדנו: ${esc(planOf(l)||l.topic)}</div>`:""}${l.nextPlan?`<div class="s">לשיעור הבא: ${esc(l.nextPlan)}</div>`:""}</div></button>`}).join(""):`<div class="empty">עוד אין שיעורים.</div>`}</div>
   <h3 style="font-size:1.05rem">תשלומים</h3>
   <div class="list">${ps.length?ps.map(p=>`<div class="item" style="cursor:default"><div class="main"><div class="t num" style="text-align:right">${fmtD(p.date)}</div><div class="s">${esc(payMethodText(p))}</div></div><div class="end"><div class="money num">${ils(p.amount)}</div>${rcptLink(p)}</div></div>`).join(""):`<div class="empty">עוד אין תשלומים.</div>`}</div>
   <button class="btn ghost" data-close>סגירה</button>`,r=>{
@@ -1182,16 +1196,11 @@ function lessonSheet(id,preset={}){
     <div class="grid2"><label class="f">תאריך<input type="date" id="l_date" value="${esc(l.date)}"></label><label class="f">שעה<input type="time" id="l_time" value="${esc(l.time||"")}"></label></div>
     <div class="alert warn" id="nextHint" ${!id&&nextHint(S.students[l.studentId])?"":"hidden"}><div class="tiny" id="nextHintT">${esc(id?"":nextHint(S.students[l.studentId]))}</div></div>
     <div class="alert bad" id="vacHint" ${vacationOn(l.date)?"":"hidden"}><div class="tiny">התאריך הזה נופל על חופשה</div></div>
-    <div class="sechd">לפני השיעור · מה מתכננים</div>
-    ${id?(()=>{const pv=prevLesson({...l,id});return pv?`<div class="panel" style="padding:10px 12px;background:var(--sunk);border:0"><b class="tiny">מה עשינו בשיעור שעבר · ${fmtD(pv.date)}</b><div>${pv.topic?esc(pv.topic):`<span class="muted">לא נרשם על מה עבדתם</span>`}</div>${pv.homework?`<div class="tiny muted">תרגול לבית: ${esc(pv.homework)}</div>`:""}</div>`:""})():""}
-    <label class="f">על מה נעבוד בשיעור הזה<textarea id="l_plan" placeholder="מה רוצים להספיק בשיעור הזה">${esc(l.plan||"")}</textarea></label>
-    <div class="sechd">אחרי השיעור · מה היה</div>
+    ${planFields({...l,id:id||"_new"},"l")}
+    <div class="sechd">פרטים</div>
     <label class="f">סטטוס</label>
     <div class="seg" id="stSeg">${Object.entries(LESSON_STATUS).map(([k,v])=>`<button type="button" data-s="${k}" aria-pressed="${l.status===k}">${v[0]}</button>`).join("")}</div>
     <div class="tiny muted">"התקיים" ו"בוטל בחיוב" נכנסים לחיוב התלמיד.</div>
-    <label class="f">על מה עבדנו<textarea id="l_topic" placeholder="נשימה, תמיכה, מעברי רגיסטר, שיר…">${esc(l.topic||"")}</textarea></label>
-    <label class="f">תרגול לבית<input type="text" id="l_hw" value="${esc(l.homework||"")}"></label>
-    <div class="sechd">פרטים</div>
     <div class="grid2"><label class="f">משך (דקות)<input type="number" id="l_dur" value="${esc(l.duration||60)}"></label><label class="f">מחיר השיעור<input type="number" id="l_price" value="${esc(l.price??"")}"></label></div>
     <label class="f">מקום<select id="l_mode">${opts(["פרונטלי","זום"],l.mode)}</select></label>
     ${l.gcalTitle?`<div class="tiny muted note">ביומן גוגל: ${esc(l.gcalTitle)}</div>`:""}
@@ -1204,7 +1213,8 @@ function lessonSheet(id,preset={}){
     r.querySelectorAll("#stSeg button").forEach(b=>b.onclick=()=>{status=b.dataset.s;r.querySelectorAll("#stSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
     r.querySelector("#l_student").onchange=e=>{const s=S.students[e.target.value];r.querySelector("#l_phone").value=s?.phone||"";if(s&&!id){r.querySelector("#l_price").value=s.nextPrice??s.price??0;r.querySelector("#l_dur").value=s.duration||60;const h=nextHint(s);r.querySelector("#nextHint").hidden=!h;r.querySelector("#nextHintT").textContent=h}};
     r.querySelector("#l_date").onchange=e=>{r.querySelector("#vacHint").hidden=!vacationOn(e.target.value)};    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();
-      const data={studentId:val(r,"l_student"),date:val(r,"l_date"),time:val(r,"l_time"),duration:+val(r,"l_dur")||60,price:+val(r,"l_price")||0,mode:val(r,"l_mode"),status,topic:val(r,"l_topic"),homework:val(r,"l_hw"),plan:val(r,"l_plan")};
+      const data={studentId:val(r,"l_student"),date:val(r,"l_date"),time:val(r,"l_time"),duration:+val(r,"l_dur")||60,price:+val(r,"l_price")||0,mode:val(r,"l_mode"),status,plan:val(r,"l_plan"),nextPlan:val(r,"l_next")};
+      if(data.plan&&data.plan===(prevLesson({...data,id:id||"_new"})?.nextPlan||""))data.plan="";
       if(id)Object.keys(l).forEach(k=>{if(k!=="id"&&!(k in data))data[k]=l[k]});
       if(!data.date){toast("צריך תאריך");return}
       if(id){data.reminderSent=!!l.reminderSent;if(l.gcalId)data.gcalId=l.gcalId;if(l.gcalTitle)data.gcalTitle=l.gcalTitle}
