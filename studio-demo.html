@@ -84,6 +84,13 @@ section.view{display:flex;flex-direction:column;gap:18px}
 
 /* lists */
 .list{display:flex;flex-direction:column}
+.item:has(.planbox){flex-wrap:wrap}
+.sechd{margin-top:8px;padding-top:10px;border-top:1px solid var(--line);font-weight:700;color:var(--accent);font-size:.92rem}
+.planbox{flex-basis:100%;display:flex;flex-direction:column;gap:4px;margin-top:8px;padding:8px 10px;background:var(--sunk);border-radius:10px;font-size:.88rem;line-height:1.45}
+.planbox .plk{display:inline-block;font-weight:600;color:var(--ink2);margin-inline-end:6px}
+.lnk{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font:inherit;font-size:.82rem;text-decoration:underline}
+.upnext .scroll{max-height:none}
+.quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;border:1px dashed var(--line);border-radius:var(--r)}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;align-items:stretch}
 .tiles>.panel{display:flex;flex-direction:column;max-height:400px;min-height:0}
 .tiles>.panel>.scroll{overflow-y:auto;min-height:0;flex:1;margin-inline-end:-6px;padding-inline-end:6px}
@@ -540,30 +547,29 @@ function viewHome(){
     <div class="kpi" role="button" tabindex="0" data-act="toStudents" style="cursor:pointer"><div class="l">תלמידים פעילים</div><div class="v num">${arr(S.students).filter(s=>s.active!==false).length}</div><div class="tiny muted">${arr(S.students).filter(s=>s.active===false).length} לא פעילים</div></div>
   </div>
   ${splitPanel(y)}
+  <div class="panel upnext">
+    <div class="spread"><h2>השיעורים הקרובים</h2><button class="btn small primary" data-act="newLesson">שיעור חדש</button></div>
+    <div class="scroll"><div class="list">${upcoming.length?upcoming.map(l=>lessonItem(l,true)).join(""):`<div class="empty">אין שיעורים מתוכננים. לחץ "שיעור חדש" כדי לקבוע.</div>`}</div></div>
+  </div>
   <div class="tiles">
   <div class="panel">
     <div class="spread"><h2>דורש תשומת לב</h2>${al.length?`<span class="chip warn">${al.length}</span>`:""}</div>
     <div class="scroll"><div class="list" style="gap:8px">${al.length?al.map(a=>`<div class="alert ${a.k}"><div style="flex:1;min-width:0"><b>${esc(a.t)}</b><span class="tiny">${esc(a.s)}</span></div>${a.ypay?`<a class="btn small" href="${YPAY_URL}" target="_blank" rel="noopener">לוויי־פיי</a>`:""}${a.vac?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="vacNotify" data-id="${a.vac}">הודעה לתלמידים</button>`:""}${a.go?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="${a.go[0]}">${a.go[1]}</button>`:""}</div>`).join(""):`<div class="alert ok"><div><b>הכול מסודר</b><span class="tiny">אין חובות, תזכורות קרובות או תשלומים בלי קבלה</span></div></div>`}</div></div>
   </div>
   ${remindPanel}
-  <div class="panel">
-    <div class="spread"><h2>השיעורים הקרובים</h2><button class="btn small primary" data-act="newLesson">שיעור חדש</button></div>
-    <div class="scroll"><div class="list">${upcoming.length?upcoming.map(lessonItem).join(""):`<div class="empty">אין שיעורים מתוכננים. לחץ "שיעור חדש" כדי לקבוע.</div>`}</div></div>
-  </div>
-  <div class="panel"><div class="spread"><h2>פעולות מהירות</h2></div>
-  <div class="acts">
-    <button class="btn" data-act="newPayment">רישום תשלום</button>
-    <span style="display:flex;gap:4px;align-items:center"><button class="btn primary" style="flex:1" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" aria-label="מה כדאי להעלות">?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span></span>
-    <button class="btn" data-act="newExpense">רישום הוצאה</button>
-    <button class="btn" data-act="newStudent">תלמיד חדש</button>
-    <button class="btn" data-act="newVacation">חופשה</button>
-    <a class="btn ghost" href="${YPAY_URL}" target="_blank" rel="noopener">הפקת קבלה בוויי־פיי</a>
-  </div>
-  </div>
+
   </div>
   <div class="panel" style="padding:12px">
     <div class="spread" style="margin-bottom:8px"><h2 style="margin:0">השבוע ביומן</h2><button class="btn small ghost" data-act="toCal">ליומן המלא</button></div>
     ${weekGrid(0)}
+  </div>
+  <div class="quick"><span class="tiny muted">פעולות מהירות:</span>
+    <button class="btn small" data-act="newPayment">רישום תשלום</button>
+    <span style="display:flex;gap:4px;align-items:center"><button class="btn small" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" aria-label="מה כדאי להעלות">?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span></span>
+    <button class="btn small" data-act="newExpense">רישום הוצאה</button>
+    <button class="btn small" data-act="newStudent">תלמיד חדש</button>
+    <button class="btn small" data-act="newVacation">חופשה</button>
+    <a class="btn small ghost" href="${YPAY_URL}" target="_blank" rel="noopener">הפקת קבלה בוויי־פיי</a>
   </div>
 `;
 }
@@ -592,10 +598,30 @@ function settleSheet(id){
     const pp=r.querySelector("[data-prepaid]");if(pp)pp.onclick=()=>done(0,"","");
   });
 }
-function lessonItem(l){
+function prevLesson(l){
+  return arr(S.lessons).filter(x=>x.studentId===l.studentId&&x.id!==l.id&&(x.status==="done"||x.status==="late")&&(x.date+(x.time||""))<(l.date+(l.time||""))).sort((a,b)=>(b.date+(b.time||"")).localeCompare(a.date+(a.time||"")))[0]||null;
+}
+function planBox(l){
+  const pv=prevLesson(l);
+  const last=pv?`<div class="pl"><span class="plk">שיעור שעבר · ${fmtD(pv.date)}</span>${pv.topic?esc(pv.topic):`<span class="muted">לא נרשם על מה עבדתם</span>`}${pv.homework?`<span class="muted"> · תרגול לבית: ${esc(pv.homework)}</span>`:""}</div>`:`<div class="pl"><span class="plk">שיעור שעבר</span><span class="muted">זה השיעור הראשון שרשום</span></div>`;
+  const next=l.plan?`<div class="pl"><span class="plk">נעבוד על</span>${esc(l.plan)} <button class="lnk" data-act="planLesson" data-id="${l.id}">עריכה</button></div>`:`<div class="pl"><button class="btn small" data-act="planLesson" data-id="${l.id}">+ על מה נעבוד בשיעור הזה</button></div>`;
+  return `<div class="planbox">${last}${next}</div>`;
+}
+function planSheet(id){
+  const l=S.lessons[id];if(!l)return;const pv=prevLesson(l);
+  openSheet(`<h2>${esc(studentName(l.studentId)||"")} · ${fmtD(l.date)}</h2>
+  ${pv?`<div class="panel" style="padding:12px;background:var(--sunk);border:0"><b>שיעור שעבר · ${fmtD(pv.date)}</b><div>${pv.topic?esc(pv.topic):`<span class="muted">לא נרשם על מה עבדתם</span>`}</div>${pv.homework?`<div class="tiny muted">תרגול לבית: ${esc(pv.homework)}</div>`:""}</div>`:""}
+  <label class="f">על מה נעבוד בשיעור הזה<textarea id="p_plan" placeholder="להמשיך מאיפה שעצרנו, שיר חדש, תרגילי נשימה…">${esc(l.plan||"")}</textarea></label>
+  <div class="row"><button class="btn primary" data-save>שמירה</button><button class="btn ghost" data-close>ביטול</button></div>`,r=>{
+    r.querySelector("[data-save]").onclick=async()=>{const v=r.querySelector("#p_plan").value.trim();
+      if(await save("lessons",id,{...strip(S.lessons[id]),plan:v})===null)return;closeSheet();toast("נשמר")};
+    setTimeout(()=>r.querySelector("#p_plan").focus(),50);
+  });
+}
+function lessonItem(l,withPlan){
   const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;
   const d=parseD(l.date);
-  return `<div class="item" role="button" tabindex="0" data-act="editLesson" data-id="${l.id}"><div class="main"><div class="t">${esc(studentName(l.studentId)||"תלמיד שנמחק")}</div><div class="s">יום ${DAYS[d.getDay()]} ${fmtD(l.date)} · <span class="num">${esc(l.time||"")}</span> · ${l.duration||60} דק׳${l.mode?" · "+esc(l.mode):""}</div></div><div class="end"><span class="chip ${st[1]}">${st[0]}</span>${l.paid?`<span class="chip ok">שולם${l.paidBy?" · קבלה "+esc(l.paidBy):""}</span>`:settleBtn(l)}</div></div>`;
+  return `<div class="item" role="button" tabindex="0" data-act="editLesson" data-id="${l.id}"><div class="main"><div class="t">${esc(studentName(l.studentId)||"תלמיד שנמחק")}</div><div class="s">יום ${DAYS[d.getDay()]} ${fmtD(l.date)} · <span class="num">${esc(l.time||"")}</span> · ${l.duration||60} דק׳${l.mode?" · "+esc(l.mode):""}</div></div><div class="end"><span class="chip ${st[1]}">${st[0]}</span>${l.paid?`<span class="chip ok">שולם${l.paidBy?" · קבלה "+esc(l.paidBy):""}</span>`:settleBtn(l)}</div>${withPlan?planBox(l):""}</div>`;
 }
 
 function viewStudents(){
@@ -1152,17 +1178,23 @@ function lessonSheet(id,preset={}){
   openSheet(`<h2>${id?"שיעור":"שיעור חדש"}</h2>
   <form id="f" class="list" style="gap:10px">
     <label class="f">תלמיד או קבוצה<select id="l_student">${studentOpts(l.studentId)}</select></label>
+    <label class="f">טלפון של התלמיד<input type="tel" id="l_phone" inputmode="tel" dir="ltr" placeholder="050-0000000" value="${esc(S.students[l.studentId]?.phone||"")}"></label>
     <div class="grid2"><label class="f">תאריך<input type="date" id="l_date" value="${esc(l.date)}"></label><label class="f">שעה<input type="time" id="l_time" value="${esc(l.time||"")}"></label></div>
-    <div class="grid2"><label class="f">משך (דקות)<input type="number" id="l_dur" value="${esc(l.duration||60)}"></label><label class="f">מחיר השיעור<input type="number" id="l_price" value="${esc(l.price??"")}"></label></div>
     <div class="alert warn" id="nextHint" ${!id&&nextHint(S.students[l.studentId])?"":"hidden"}><div class="tiny" id="nextHintT">${esc(id?"":nextHint(S.students[l.studentId]))}</div></div>
     <div class="alert bad" id="vacHint" ${vacationOn(l.date)?"":"hidden"}><div class="tiny">התאריך הזה נופל על חופשה</div></div>
-    <label class="f">מקום<select id="l_mode">${opts(["פרונטלי","זום"],l.mode)}</select></label>
+    <div class="sechd">לפני השיעור · מה מתכננים</div>
+    ${id?(()=>{const pv=prevLesson({...l,id});return pv?`<div class="panel" style="padding:10px 12px;background:var(--sunk);border:0"><b class="tiny">מה עשינו בשיעור שעבר · ${fmtD(pv.date)}</b><div>${pv.topic?esc(pv.topic):`<span class="muted">לא נרשם על מה עבדתם</span>`}</div>${pv.homework?`<div class="tiny muted">תרגול לבית: ${esc(pv.homework)}</div>`:""}</div>`:""})():""}
+    <label class="f">על מה נעבוד בשיעור הזה<textarea id="l_plan" placeholder="מה רוצים להספיק בשיעור הזה">${esc(l.plan||"")}</textarea></label>
+    <div class="sechd">אחרי השיעור · מה היה</div>
     <label class="f">סטטוס</label>
     <div class="seg" id="stSeg">${Object.entries(LESSON_STATUS).map(([k,v])=>`<button type="button" data-s="${k}" aria-pressed="${l.status===k}">${v[0]}</button>`).join("")}</div>
     <div class="tiny muted">"התקיים" ו"בוטל בחיוב" נכנסים לחיוב התלמיד.</div>
-    ${l.gcalTitle?`<div class="tiny muted note">ביומן גוגל: ${esc(l.gcalTitle)}</div>`:""}
     <label class="f">על מה עבדנו<textarea id="l_topic" placeholder="נשימה, תמיכה, מעברי רגיסטר, שיר…">${esc(l.topic||"")}</textarea></label>
     <label class="f">תרגול לבית<input type="text" id="l_hw" value="${esc(l.homework||"")}"></label>
+    <div class="sechd">פרטים</div>
+    <div class="grid2"><label class="f">משך (דקות)<input type="number" id="l_dur" value="${esc(l.duration||60)}"></label><label class="f">מחיר השיעור<input type="number" id="l_price" value="${esc(l.price??"")}"></label></div>
+    <label class="f">מקום<select id="l_mode">${opts(["פרונטלי","זום"],l.mode)}</select></label>
+    ${l.gcalTitle?`<div class="tiny muted note">ביומן גוגל: ${esc(l.gcalTitle)}</div>`:""}
     ${id&&settleInfo(l)?`<button type="button" class="btn primary" data-settle>✓ השיעור התקיים והכסף התקבל</button>`:""}
     ${id&&l.status==="planned"?`<div class="row">${waButton(S.students[l.studentId]?.phone,lessonMsg({...l,id}),l.reminderSent?"תזכורת נשלחה · שליחה שוב":"שליחת תזכורת בוואטסאפ",`data-sent="${id}"`)}</div>`:""}
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div>
@@ -1170,12 +1202,14 @@ function lessonSheet(id,preset={}){
     let status=l.status;
     const sb=r.querySelector("[data-settle]");if(sb)sb.onclick=()=>settleSheet(id);
     r.querySelectorAll("#stSeg button").forEach(b=>b.onclick=()=>{status=b.dataset.s;r.querySelectorAll("#stSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
-    r.querySelector("#l_student").onchange=e=>{const s=S.students[e.target.value];if(s&&!id){r.querySelector("#l_price").value=s.nextPrice??s.price??0;r.querySelector("#l_dur").value=s.duration||60;const h=nextHint(s);r.querySelector("#nextHint").hidden=!h;r.querySelector("#nextHintT").textContent=h}};
+    r.querySelector("#l_student").onchange=e=>{const s=S.students[e.target.value];r.querySelector("#l_phone").value=s?.phone||"";if(s&&!id){r.querySelector("#l_price").value=s.nextPrice??s.price??0;r.querySelector("#l_dur").value=s.duration||60;const h=nextHint(s);r.querySelector("#nextHint").hidden=!h;r.querySelector("#nextHintT").textContent=h}};
     r.querySelector("#l_date").onchange=e=>{r.querySelector("#vacHint").hidden=!vacationOn(e.target.value)};    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();
-      const data={studentId:val(r,"l_student"),date:val(r,"l_date"),time:val(r,"l_time"),duration:+val(r,"l_dur")||60,price:+val(r,"l_price")||0,mode:val(r,"l_mode"),status,topic:val(r,"l_topic"),homework:val(r,"l_hw")};
+      const data={studentId:val(r,"l_student"),date:val(r,"l_date"),time:val(r,"l_time"),duration:+val(r,"l_dur")||60,price:+val(r,"l_price")||0,mode:val(r,"l_mode"),status,topic:val(r,"l_topic"),homework:val(r,"l_hw"),plan:val(r,"l_plan")};
+      if(id)Object.keys(l).forEach(k=>{if(k!=="id"&&!(k in data))data[k]=l[k]});
       if(!data.date){toast("צריך תאריך");return}
       if(id){data.reminderSent=!!l.reminderSent;if(l.gcalId)data.gcalId=l.gcalId;if(l.gcalTitle)data.gcalTitle=l.gcalTitle}
       const sv=S.students[data.studentId];
+      const ph=val(r,"l_phone").trim();if(sv&&ph!==(sv.phone||""))await save("students",data.studentId,{...strip(sv),phone:ph});
       const nid=await save("lessons",id,data);
       if(nid!==null){
         gcalPush(nid,data);
@@ -1523,6 +1557,7 @@ document.addEventListener("click",async e=>{
     case "tagActive":studentDetail(id,true);break;
     case "newLesson":lessonSheet(null,a.dataset.date?{date:a.dataset.date}:{});break;
     case "editLesson":lessonSheet(id);break;
+    case "planLesson":planSheet(id);break;
     case "settle":settleSheet(id);break;
     case "newPayment":paymentSheet();break;
     case "editPayment":paymentSheet(id);break;
