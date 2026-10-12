@@ -1,10 +1,51 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>html,body{margin:0}body{font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>יומן הסטודיו · הדגמה</title>
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>html,body{margin:0}body{font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tg .hd .ds{display:none}
+@media (max-width:700px){
+  .gridwrap{overflow-x:hidden!important}
+  .tg{grid-template-columns:28px repeat(7,minmax(0,1fr))!important;min-width:0!important}
+  .tg .hd{padding:8px 0 8px!important;font-size:.72rem!important;letter-spacing:0!important}
+  .tg .hd .dl{display:none}.tg .hd .ds{display:block}
+  .tg .hd .dn{font-size:1.05rem!important}
+  .tg .hrs div{font-size:.6rem!important}
+  .ev{inset-inline:1px!important;padding:2px 2px!important;border-radius:4px!important}
+  .ev b{font-family:var(--body)!important;letter-spacing:0!important;text-overflow:clip!important;font-size:.62rem!important;line-height:1.15!important;white-space:normal!important;word-break:keep-all!important;overflow-wrap:normal!important;overflow:hidden}
+  .ev .num,.ev .paynote,.ev .bt{font-size:.58rem!important}
+  .nowlbl{display:none}
+}
+
+@media (max-width:600px){
+  .kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+  .kpi{padding:8px 8px!important;border-radius:10px}
+  .kpi .l{font-size:.68rem!important;line-height:1.2}
+  .kpi .v{font-size:1.15rem!important}
+  .kpi .tiny{font-size:.62rem!important}
+  .split{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .split .sp{padding:8px!important;border-top:0!important;border-inline-start:1px solid var(--line)!important}
+  .split .sp:first-child{border-inline-start:0!important}
+  .split .sp .v,.split .sp b{font-size:1.1rem!important}
+  .split .sp .tiny{font-size:.62rem!important}
+  .panel{padding:12px!important}
+  h1{font-size:1.6rem!important}
+}
+.ev.reg{background:#E3F4EA!important;border-inline-start:3px solid #2E8B57!important}
+.lg{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--surface);border:1px solid var(--line);border-inline-start:3px solid var(--accent);vertical-align:middle}
+.lg.reg{background:#E3F4EA;border-inline-start-color:#2E8B57}.lg.od{background:var(--red-soft);border-inline-start-color:var(--red)}
+@media (prefers-color-scheme:dark){.ev.reg,.lg.reg{background:#183527!important}}
+.ev.reg.cancelled{background:#E3F4EA!important;opacity:.75}
+.ev.reg.cancelled b{text-decoration:line-through}
+.ev.cancelled::after{content:"בוטל";display:block;font-size:.6rem;font-weight:700;color:var(--red)}
+.wsum{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;width:100%;padding:10px 14px;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--accent-soft);cursor:pointer;text-align:right;color:var(--ink)}
+.wsum .wn{font-family:var(--display);font-size:1.7rem;font-weight:500;color:var(--accent-strong);line-height:1}
+.wsum .wl{font-weight:700}
+.tg .hd .dc{display:block;font-size:.62rem;font-weight:700;color:var(--accent);letter-spacing:0}
+@media (max-width:700px){.tg .hd .dc{font-size:.55rem}}
+</style></head><body><title>יומן הסטודיו · הדגמה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&family=Frank+Ruhl+Libre:wght@300;400;500&family=Bellefair&display=swap">
 <style>
 /* Layout: calm single-hue operating console; cards on a soft ground, bottom tab bar on phones, top rail on desktop */
 :root{
-  --bg:#F3F6F9; --surface:#FFFFFF; --sunk:#EDF1F5; --ink:#16222D; --ink2:#3A4856; --muted:#7B8896; --line:#E3E9EF; --line2:#EEF2F6;
+  --bg:#F3F6F9; --surface:#FFFFFF; --sunk:#EDF1F5; --ink:#16222D; --ink2:#3A4856; --muted:#7B8896; --line:#E3E9EF; --line2:#EEF2F6; --red:#C62828; --red-soft:#FDECEC;
   --accent:#3D6C93; --accent-ink:#FFFFFF; --accent-soft:#E6EFF7; --accent-strong:#24496A;
   --brass:#16222D; --brass-soft:#E6EFF7;
   --ok:#3D6C93; --ok-soft:#EEF4F9; --warn:#24496A; --warn-soft:#E3ECF5; --bad:#FFFFFF; --bad-soft:#24496A; --neg:#24496A;
@@ -14,21 +55,23 @@
   --shadow-lg:0 12px 40px rgb(22 34 45 / .16);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F151B; --surface:#161F28; --sunk:#1C2732; --ink:#E8EEF3; --ink2:#C3CED8; --muted:#8C9AA7; --line:#25313D; --line2:#1E2933;
+  --bg:#0F151B; --surface:#161F28; --sunk:#1C2732; --ink:#E8EEF3; --ink2:#C3CED8; --muted:#8C9AA7; --line:#25313D; --line2:#1E2933; --red:#FF8A80; --red-soft:#3A1F22;
   --accent:#8FB6D8; --accent-ink:#0F1A24; --accent-soft:#1D2F40; --accent-strong:#B9D3EA;
   --brass:#E8EEF3; --brass-soft:#1D2F40;
   --ok:#8FB6D8; --ok-soft:#1A2733; --warn:#B9D3EA; --warn-soft:#20303F; --bad:#0F1A24; --bad-soft:#B9D3EA; --neg:#B9D3EA;
   --shadow:0 1px 2px rgb(0 0 0 / .3); --shadow-lg:0 12px 40px rgb(0 0 0 / .5); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0F151B; --surface:#161F28; --sunk:#1C2732; --ink:#E8EEF3; --ink2:#C3CED8; --muted:#8C9AA7; --line:#25313D; --line2:#1E2933;
+  --bg:#0F151B; --surface:#161F28; --sunk:#1C2732; --ink:#E8EEF3; --ink2:#C3CED8; --muted:#8C9AA7; --line:#25313D; --line2:#1E2933; --red:#FF8A80; --red-soft:#3A1F22;
   --accent:#8FB6D8; --accent-ink:#0F1A24; --accent-soft:#1D2F40; --accent-strong:#B9D3EA;
   --brass:#E8EEF3; --brass-soft:#1D2F40;
   --ok:#8FB6D8; --ok-soft:#1A2733; --warn:#B9D3EA; --warn-soft:#20303F; --bad:#0F1A24; --bad-soft:#B9D3EA; --neg:#B9D3EA;
   --shadow:0 1px 2px rgb(0 0 0 / .3); --shadow-lg:0 12px 40px rgb(0 0 0 / .5); color-scheme:dark}
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
-body{color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;direction:rtl;padding-inline:16px;padding-block:0 104px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1000px;margin:0 auto}
+html{font-size:14px}
+body{color:var(--ink);font-family:var(--body);font-size:13.5px;line-height:1.55;direction:rtl;padding-inline:16px;padding-block:0 104px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto}
+@media (max-width:600px){body{padding-inline:10px!important}}
 h1,h2,h3{font-family:var(--body);font-weight:600;letter-spacing:-.005em;margin:0;text-wrap:balance}
 button,input,select,textarea{font:inherit;color:inherit}
 .num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
@@ -92,6 +135,22 @@ section.view{display:flex;flex-direction:column;gap:18px}
 .lnk{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font:inherit;font-size:.82rem;text-decoration:underline}
 .upnext .scroll{max-height:none}
 .quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;border:1px dashed var(--line);border-radius:var(--r)}
+.settlewrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.duelbl{color:var(--muted);font-size:.8rem;font-weight:600}
+.unpaid{color:var(--red);font-weight:700;font-size:.8rem}
+.item.od,.lesson.od{background:var(--red-soft)!important;box-shadow:inset -3px 0 0 var(--red)}
+.ev.od{border-color:var(--red)!important;border-inline-start:3px solid var(--red)!important;background:var(--red-soft)!important}
+.rhbg{margin:6px 0;padding:6px 10px;background:var(--sunk);border-radius:8px}.rhbg summary{cursor:pointer;color:var(--accent);font-weight:600}
+.rhsched{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}
+.rhday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;color:var(--ink)}
+.rhday.on{border-color:var(--accent);background:var(--accent-soft)}
+.rhday.past{opacity:.6}
+.rhplan textarea{border-color:var(--accent)}
+.rhnum{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:.8rem;font-weight:700;margin-inline-end:8px;vertical-align:middle}
+.remindchip{flex-basis:100%;margin-top:8px;padding:8px 12px;border-radius:10px;background:#FFF4D6;color:#7A4B00;font-weight:700;border-inline-start:4px solid #E0A100}
+@media (prefers-color-scheme:dark){.remindchip{background:#3A2E12;color:#FFD68A}}
+.traitchip{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--ink2);vertical-align:middle;margin-inline-start:4px}
+.rhtrait{width:100%;margin:6px 0;font-size:.85rem}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;align-items:stretch}
 .tiles>.panel{display:flex;flex-direction:column;max-height:400px;min-height:0}
 .tiles>.panel>.scroll{overflow-y:auto;min-height:0;flex:1;margin-inline-end:-6px;padding-inline-end:6px}
@@ -287,7 +346,7 @@ header.top{padding-top:8px!important}
 .kpi[role=button]{cursor:pointer}
 .kpi[role=button] .l::after{content:" ←";color:var(--accent);opacity:.7}
 a.rcpt{text-decoration:none;cursor:pointer} a.rcpt:hover{background:var(--accent);color:var(--accent-ink)}
-.tipbox{position:fixed;z-index:60;max-width:min(320px,86vw);background:var(--ink);color:var(--bg);padding:9px 12px;border-radius:10px;font-size:.84rem;line-height:1.5;box-shadow:var(--shadow-lg);pointer-events:none;white-space:normal;text-align:right}
+.tipbox{white-space:pre-line;position:fixed;z-index:60;max-width:min(320px,86vw);background:var(--ink);color:var(--bg);padding:9px 12px;border-radius:10px;font-size:.84rem;line-height:1.5;box-shadow:var(--shadow-lg);pointer-events:none;white-space:normal;text-align:right}
 .ev.busy{cursor:help!important}
 .ev .bt{white-space:normal!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pulse{animation:softglow 2.4s ease-in-out infinite}
@@ -368,7 +427,7 @@ const DAYS=["ראשון","שני","שלישי","רביעי","חמישי","שיש
 
 const S={students:{},lessons:{},payments:{},expenses:{},reminders:{},authorities:{},vacations:{},rhStudents:{},rhLessons:{},ready:false,canWrite:true};
 const DEF_LESSON_TPL="היי {שם}, תזכורת לשיעור פיתוח קול {יום} ב־{שעה}{מקום}. נתראה! דור";
-const DEF_VAC_TPL="היי {שם}, רציתי לעדכן שאני בחופשה מ־{מתאריך} עד {עדתאריך}, ולכן לא יתקיימו שיעורים בימים האלה. נחזור כרגיל אחרי. דור";
+const DEF_VAC_TPL="היי {שם}, רציתי לעדכן שאני בחופשה מ־{מתאריך} עד {עדתאריך}, ולכן לא יתקיימו שיעורים בימים האלה. נחזור כרגיל אחרי.";
 let db=null, assets=null, downloads=null;
 let tab="home", weekOffset=0, calMode="grid", finMonth=null, finYear=null, studentQuery="", payFilter="all";
 
@@ -422,7 +481,8 @@ function fill(tpl,m){return tpl.replace(/\{([^}]+)\}/g,(x,k)=>m[k]??x)}
 function lessonMsg(l){const s=S.students[l.studentId]||{};const d=parseD(l.date);const tmw=daysBetween(today(),l.date);
   const day=tmw===0?"היום":tmw===1?"מחר":`ביום ${DAYS[d.getDay()]} ${fmtD(l.date)}`;
   return fill(S.authorities.settings?.lessonTpl||DEF_LESSON_TPL,{"שם":(s.name||"").split(" ")[0],"יום":day,"שעה":l.time||"","מקום":l.mode==="זום"?" בזום":""})}
-function vacMsg(v,s){return fill(S.authorities.settings?.vacTpl||DEF_VAC_TPL,{"שם":(s.name||"").split(" ")[0],"מתאריך":fmtD(v.from),"עדתאריך":fmtD(v.to||v.from)})}
+function vacMsg(v,s){return vacMsg0(v,s).replace(/\s*דור\s*$/,"")}
+function vacMsg0(v,s){return fill(S.authorities.settings?.vacTpl||DEF_VAC_TPL,{"שם":(s.name||"").split(" ")[0],"מתאריך":fmtD(v.from),"עדתאריך":fmtD(v.to||v.from)})}
 function waButton(phone,text,label,extra=""){const u=waLink(phone,text);return u?`<a class="btn small" href="${u}" target="_blank" rel="noopener" ${extra}>${label}</a>`:`<span class="chip" title="אין טלפון בכרטיס התלמיד">אין טלפון</span>`}
 
 /* ---------- data ---------- */
@@ -512,7 +572,7 @@ function alertsList(){
   if(debtors.length)out.push({k:"warn",t:`${debtors.length} תלמידים עם חוב`,s:debtors.map(s=>s.name+" "+ils(-studentBalance(s.id))).join(" · "),go:["toStudents","לרשימת התלמידים"]});
   const noRcpt=arr(S.payments).filter(p=>needsRcpt(p));
   if(noRcpt.length)out.push({k:"warn",t:`${noRcpt.length} תשלומים בלי קבלה`,s:"כדאי להפיק קבלה בוויי־פיי כדי שההכנסה תדווח",ypay:1});
-  const clash=arr(S.lessons).filter(l=>l.status==="planned"&&l.date>=t&&vacationOn(l.date));
+  const clash=arr(S.lessons).filter(l=>{const v=l.status==="planned"&&l.date>=t&&vacationOn(l.date);return v&&daysBetween(t,v.from)<=7&&!v.notified});
   if(clash.length)out.push({k:"bad",t:`${clash.length} שיעורים נופלים על חופשה`,s:clash.map(l=>studentName(l.studentId)+" "+fmtD(l.date)).join(" · "),vac:vacationOn(clash[0].date)?.id});
   const endOf=l=>{const [h,m]=(l.time||"00:00").split(":").map(Number);const x=h*60+m+(+l.duration||60);return pad(Math.floor(x/60))+":"+pad(x%60)};
   const busyClash=arr(S.lessons).filter(l=>l.status==="planned"&&l.date>=t&&G.busy.some(b=>b.date===l.date&&b.from<endOf(l)&&(b.to||"23:59")>(l.time||"")));
@@ -527,11 +587,14 @@ function viewHome(){
   const yearIn=arr(S.payments).filter(p=>p.date?.startsWith(y)).reduce((a,p)=>a+(+p.amount||0),0);
   const monthEx=arr(S.expenses).filter(e=>e.date?.startsWith(ym)).reduce((a,e)=>a+recog(e),0);
   const monthLessons=arr(S.lessons).filter(l=>l.date?.startsWith(ym)&&l.status==="done").length;
-  const upcoming=arr(S.lessons).filter(l=>l.date>=t&&l.status==="planned").sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,6);
+  const upAllList=arr(S.lessons).filter(l=>l.date>=t&&l.status==="planned").sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const upcoming=upAllList.slice(0,6), upRest=upAllList.slice(6);
+  const wkLabel=d=>{const w0=weekStart(0),dd=parseD(d);const n=Math.floor((dd-w0)/(7*864e5));return n<=0?"השבוע":n===1?"שבוע הבא":n===2?"בעוד שבועיים":`בעוד ${n} שבועות`};
+  const restHtml=()=>{let out="",last="";upRest.forEach(l=>{const w=wkLabel(l.date);if(w!==last){out+=`<div class="sh" style="margin-top:12px">${w} · ${fmtD(iso(weekStart(0+Math.floor((parseD(l.date)-weekStart(0))/(7*864e5)))))}</div>`;last=w}out+=lessonItem(l,true)});return out};
   const al=alertsList();
   const tmw=iso(new Date(d.getFullYear(),d.getMonth(),d.getDate()+1));
   const remindList=arr(S.lessons).filter(l=>(l.date===t||l.date===tmw)&&l.status==="planned").sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-  const vacs=arr(S.vacations).filter(v=>(v.to||v.from)>=t).sort((a,b)=>a.from.localeCompare(b.from));
+  const vacs=arr(S.vacations).filter(v=>(v.to||v.from)>=t&&daysBetween(t,v.from)<=7).sort((a,b)=>a.from.localeCompare(b.from));
   const remindPanel=`<div class="panel">
     <div class="spread"><h2>תזכורות לתלמידים</h2><span class="tiny muted">שיעורים של היום ומחר</span></div>
     <div class="scroll"><div class="list">${remindList.length?remindList.map(l=>{const s=S.students[l.studentId]||{};return `<div class="item" style="cursor:default"><div class="main"><div class="t">${esc(s.name||"")}</div><div class="s">${l.date===t?"היום":"מחר"} · <span class="num">${esc(l.time||"")}</span>${l.reminderSent?" · נשלחה תזכורת":""}</div></div><div class="end">${waButton(s.phone,lessonMsg(l),l.reminderSent?"שליחה שוב":"שליחה בוואטסאפ",`data-sent="${l.id}"`)}</div></div>`}).join(""):`<div class="empty">אין שיעורים היום ומחר.</div>`}</div>
@@ -550,7 +613,7 @@ function viewHome(){
   ${splitPanel(y)}
   <div class="panel upnext">
     <div class="spread"><h2>השיעורים הקרובים</h2><button class="btn small primary" data-act="newLesson">שיעור חדש</button></div>
-    <div class="scroll"><div class="list">${upcoming.length?upcoming.map(l=>lessonItem(l,true)).join(""):`<div class="empty">אין שיעורים מתוכננים. לחץ "שיעור חדש" כדי לקבוע.</div>`}</div></div>
+    <div class="scroll"><div class="list">${upcoming.length?upcoming.map(l=>lessonItem(l,true)).join("")+(upRest.length?(upShowAll?restHtml()+`<button class="btn small" style="margin-top:10px" data-act="upAll">הסתר</button>`:`<button class="btn" style="margin-top:10px;width:100%" data-act="upAll">הצג את כל השיעורים הבאים (${upRest.length})</button>`):""):`<div class="empty">אין שיעורים מתוכננים. לחץ "שיעור חדש" כדי לקבוע.</div>`}</div></div>
   </div>
   <div class="tiles">
   <div class="panel">
@@ -561,8 +624,9 @@ function viewHome(){
 
   </div>
   <div class="panel" style="padding:12px">
-    <div class="spread" style="margin-bottom:8px"><h2 style="margin:0">השבוע ביומן</h2><button class="btn small ghost" data-act="toCal">ליומן המלא</button></div>
-    ${weekGrid(0)}
+    <div class="spread" style="margin-bottom:8px"><h2 style="margin:0">${weekOffset===0?"השבוע ביומן":weekOffset===1?"שבוע הבא":weekOffset===-1?"שבוע שעבר":weekOffset>1?"בעוד "+weekOffset+" שבועות":"לפני "+(-weekOffset)+" שבועות"}</h2><div class="row"><button class="btn small" data-act="weekPrev">→ קודם</button>${weekOffset?`<button class="btn small ghost" data-act="weekNow">השבוע</button>`:""}<button class="btn small primary" data-act="weekNext">הבא ←</button></div></div>
+    ${weekSummary(weekOffset)}
+    ${weekGrid(weekOffset)}
   </div>
   <div class="quick"><span class="tiny muted">פעולות מהירות:</span>
     <button class="btn small" data-act="newPayment">רישום תשלום</button>
@@ -580,7 +644,11 @@ function settleInfo(l){
   if(l.status==="done"||l.status==="late"){const b=studentBalance(l.studentId);if(b<0)return {due:Math.min(+l.price||0,-b)}}
   return null;
 }
-function settleBtn(l){const i=settleInfo(l);if(!i)return "";return `<button class="btn small settle" data-act="settle" data-id="${l.id}">✓ התקיים ושולם${i.due?` · ${ils(i.due)}`:""}</button>`}
+function lessonEnded(l){const [h,m]=(l.time||"00:00").split(":").map(Number);const d=parseD(l.date);d.setHours(h||0,(m||0)+(+l.duration||60),0,0);return d<new Date()}
+function overdueUnpaid(l){return !!settleInfo(l)&&l.status!=="cancelled"&&lessonEnded(l)}
+function settleBtn(l){const i=settleInfo(l);if(!i)return "";const od=overdueUnpaid(l);
+  const lbl=od?`<span class="unpaid">השיעור עוד לא שולם${i.due?" · "+ils(i.due):""}</span>`:i.due?`<span class="duelbl">עוד לא שולם · ${ils(i.due)}</span>`:`<span class="duelbl">שולם מראש</span>`;
+  return `<span class="settlewrap">${lbl}<button class="btn small settle" data-act="settle" data-id="${l.id}">לסמן שהתקיים ושולם</button></span>`}
 function settleSheet(id){
   const l=S.lessons[id];if(!l)return;const i=settleInfo(l)||{due:0};const st=S.students[l.studentId]||{};
   openSheet(`<h2>${esc(st.name||"")} · ${fmtD(l.date)}</h2>
@@ -612,22 +680,29 @@ function planBox(l){
   const pv=prevLesson(l), pl=planOf(l), w=pv?(planOf(pv)||pv.topic):"";
   const last=`<div class="pl"><span class="plk">שיעור שעבר${pv?" · "+fmtD(pv.date):""}</span>${pv?(w?esc(w):`<span class="muted">לא נרשם</span>`):`<span class="muted">זה השיעור הראשון שרשום</span>`}</div>`;
   const next=pl?`<div class="pl"><span class="plk">נעבוד על</span>${esc(pl)} <button class="lnk" data-act="planLesson" data-id="${l.id}">עריכה</button></div>`:`<div class="pl"><button class="btn small" data-act="planLesson" data-id="${l.id}">+ על מה נעבוד בשיעור הזה</button></div>`;
-  return `<div class="planbox">${last}${next}</div>`;
+  return `${l.remind?`<div class="remindchip">🔔 ${esc(l.remind)}</div>`:""}<div class="planbox">${next}</div>`;
 }
 function planFields(l,px){
-  const nm=studentName(l.studentId)||"התלמיד";
-  return `<div class="sechd">לפני השיעור · על מה נעבוד</div>
-    ${prevBox(prevLesson(l))}
-    <label class="f">על מה נעבוד בשיעור הזה<textarea id="${px}_plan" placeholder="להמשיך מאיפה שעצרנו, שיר חדש, תרגילי נשימה…">${esc(planOf(l))}</textarea></label>
+  const nm=studentName(l.studentId)||"התלמיד", pv=prevLesson(l), past=l.status!=="planned"||l.date<today();
+  const pw=pv?(planOf(pv)||pv.topic||""):"";
+  return `${pv?`<div class="sechd">שיעור שעבר · ${fmtD(pv.date)}</div>
+    <label class="f">מה עשינו בשיעור שעבר<textarea id="${px}_prev" data-pid="${pv.id}" placeholder="אם שכחת לרשום, אפשר להשלים כאן">${esc(pw)}</textarea></label>`:""}
+    <div class="sechd">${past?"השיעור הזה · על מה עבדנו":"לפני השיעור · על מה נעבוד"}</div>
+    <label class="f">${past?"על מה עבדנו בשיעור הזה":"על מה נעבוד בשיעור הזה"}<textarea id="${px}_plan" placeholder="${past?"נשימה, תמיכה, מעברי רגיסטר, שיר…":"להמשיך מאיפה שעצרנו, שיר חדש, תרגילי נשימה…"}">${esc(planOf(l)||(past?l.topic||"":""))}</textarea></label>
     <div class="sechd">לשיעור הבא · על מה נעבוד</div>
     <label class="f">מה להמשיך בשיעור הבא<textarea id="${px}_next" placeholder="מה שתרשום כאן יופיע אוטומטית בשיעור הבא של ${esc(nm)}">${esc(l.nextPlan||"")}</textarea></label>`;
+}
+async function savePrev(r,px){
+  const t=r.querySelector("#"+px+"_prev");if(!t)return;const pid=t.dataset.pid,pv=S.lessons[pid];if(!pid||!pv)return;
+  const v=t.value.trim();if(v===(planOf({...pv,id:pid})||pv.topic||""))return;
+  await save("lessons",pid,{...strip(pv),plan:v});
 }
 function planSheet(id){
   const l=S.lessons[id];if(!l)return;
   openSheet(`<h2>${esc(studentName(l.studentId)||"")} · ${fmtD(l.date)}</h2>
   ${planFields({...l,id},"p")}
   <div class="row"><button class="btn primary" data-save>שמירה</button><button class="btn ghost" data-close>ביטול</button></div>`,r=>{
-    r.querySelector("[data-save]").onclick=async()=>{
+    r.querySelector("[data-save]").onclick=async()=>{await savePrev(r,"p");
       if(await save("lessons",id,(()=>{const d={...strip(S.lessons[id]),plan:r.querySelector("#p_plan").value.trim(),nextPlan:r.querySelector("#p_next").value.trim()};if(d.plan&&d.plan===(prevLesson({...d,id})?.nextPlan||""))d.plan="";return d})())===null)return;closeSheet();toast("נשמר")};
     setTimeout(()=>r.querySelector("#p_plan").focus(),50);
   });
@@ -635,7 +710,7 @@ function planSheet(id){
 function lessonItem(l,withPlan){
   const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;
   const d=parseD(l.date);
-  return `<div class="item" role="button" tabindex="0" data-act="editLesson" data-id="${l.id}"><div class="main"><div class="t">${esc(studentName(l.studentId)||"תלמיד שנמחק")}</div><div class="s">יום ${DAYS[d.getDay()]} ${fmtD(l.date)} · <span class="num">${esc(l.time||"")}</span> · ${l.duration||60} דק׳${l.mode?" · "+esc(l.mode):""}</div></div><div class="end"><span class="chip ${st[1]}">${st[0]}</span>${l.paid?`<span class="chip ok">שולם${l.paidBy?" · קבלה "+esc(l.paidBy):""}</span>`:settleBtn(l)}</div>${withPlan?planBox(l):""}</div>`;
+  return `<div class="item${overdueUnpaid(l)?" od":""}" role="button" tabindex="0" data-act="editLesson" data-id="${l.id}"><div class="main"><div class="t">${esc(studentName(l.studentId)||"תלמיד שנמחק")}${S.students[l.studentId]?.traits?` <span class="traitchip">${esc(S.students[l.studentId].traits)}</span>`:""}</div><div class="s">יום ${DAYS[d.getDay()]} ${fmtD(l.date)} · <span class="num">${esc(l.time||"")}</span> · ${l.duration||60} דק׳${l.mode?" · "+esc(l.mode):""}</div></div><div class="end"><span class="chip ${st[1]}">${st[0]}</span>${l.paid?`<span class="chip ok">שולם${l.paidBy?" · קבלה "+esc(l.paidBy):""}</span>`:settleBtn(l)}</div>${withPlan?planBox(l):""}</div>`;
 }
 
 function viewStudents(){
@@ -675,15 +750,21 @@ function weekGrid(off){
   const hrs=[...Array(H1-H0)].map((_,i)=>`<div>${pad(H0+i)}:00</div>`).join("");
   const DUE=dueMap();
   return `<div class="gridwrap"><div class="tg" style="--hh:${HH}px">
-    <div class="hd"></div>${days.map(d=>{const dd=parseD(d);return `<div class="hd ${d===t?"today":""}">${d===t?"היום · ":""}${DAYS[dd.getDay()]}<span class="dn num">${dd.getDate()}</span></div>`}).join("")}
+    <div class="hd"></div>${days.map(d=>{const dd=parseD(d);return `<div class="hd ${d===t?"today":""}"><span class="dl">${d===t?"היום · ":""}${DAYS[dd.getDay()]}</span><span class="ds">${"אבגדהוש"[dd.getDay()]}׳</span><span class="dn num">${dd.getDate()}</span>${(()=>{const n=arr(S.lessons).filter(l=>l.date===d&&l.status!=="cancelled").length;return n?`<span class="dc">${n} שיעורים</span>`.replace("1 שיעורים","שיעור 1"):""})()}</div>`}).join("")}
     <div class="hrs">${hrs}</div>
     ${days.map(d=>{const vac=vacationOn(d);
       const busy=G.busy.filter(b=>b.date===d).map(b=>{const y=top(b.from),h=Math.max(18,top(b.to||b.from)-y);return `<div class="ev busy" tabindex="0" style="top:${y}px;height:${h}px" data-tip="${esc(b.from+"–"+(b.to||"")+" · "+b.title)}"><span class="bt">${esc(b.title)}</span></div>`}).join("");
-      const les=arr(S.lessons).filter(l=>l.date===d).map(l=>{const y=top(l.time),h=Math.max(20,(+l.duration||60)/60*HH-2);return `<button class="ev ${l.status}" style="top:${y}px;height:${h}px" data-act="editLesson" data-id="${l.id}" data-tip="${esc((studentName(l.studentId)||"")+" · "+(l.time||"")+" · "+(l.duration||60)+" דק׳"+(l.status==="planned"&&DUE[l.id]?" · לתשלום: "+ils(DUE[l.id].due)+(DUE[l.id].note?" ("+DUE[l.id].note+")":""):l.status==="done"?" · התקיים, "+ils(l.price):"")+(l.gcalTitle?" — "+l.gcalTitle:""))}"><b>${esc(studentName(l.studentId)||"?")}</b><span class="num">${esc(l.time||"")}</span>${l.mode==="זום"?" · זום":""}${l.status==="planned"&&DUE[l.id]&&DUE[l.id].due!==(+l.price||0)?`<span class="paynote">משלם ${ils(DUE[l.id].due)}</span>`:""}</button>`}).join("");
+      const les=arr(S.lessons).filter(l=>l.date===d).map(l=>{const y=top(l.time),h=Math.max(20,(+l.duration||60)/60*HH-2);return `<button class="ev ${l.status}${overdueUnpaid(l)?" od":""}${isRegular(l.studentId,l)?" reg":""}" style="top:${y}px;height:${h}px" data-act="editLesson" data-id="${l.id}" data-tip="${esc((studentName(l.studentId)||"")+" · "+(l.time||"")+" · "+(l.duration||60)+" דק׳"+(l.status==="planned"&&DUE[l.id]?" · לתשלום: "+ils(DUE[l.id].due)+(DUE[l.id].note?" ("+DUE[l.id].note+")":""):l.status==="done"?" · התקיים, "+ils(l.price):"")+(l.gcalTitle?" — "+l.gcalTitle:"")+(S.students[l.studentId]?.traits?"\n"+S.students[l.studentId].traits:"")+(l.remind?"\n\n🔔 "+l.remind:"")+(l.status==="planned"?"\n\nנעבוד על: "+(planOf(l)||"עוד לא נרשם"):(planOf(l)||l.topic)?"\n\nעבדנו על: "+(planOf(l)||l.topic):""))}"><b>${l.remind?"🔔 ":""}${esc(studentName(l.studentId)||"?")}</b><span class="num">${esc(l.time||"")}</span>${l.mode==="זום"?" · זום":""}${l.status==="planned"&&DUE[l.id]&&DUE[l.id].due!==(+l.price||0)?`<span class="paynote">משלם ${ils(DUE[l.id].due)}</span>`:""}</button>`}).join("");
       const inRange=d===t&&now.getHours()>=H0&&now.getHours()<H1;
       return `<div class="col ${vac?"vac":""} ${d===t?"today":""}" style="height:${(H1-H0)*HH}px" ${vac?`title="${esc(vac.title)}"`:""}>${inRange?`<div class="slotnow" style="top:${(now.getHours()-H0)*HH}px;height:${HH}px"></div><div class="nowline" style="top:${nowTop}px"><span class="nowdot"></span><span class="nowlbl num">${pad(now.getHours())}:${pad(now.getMinutes())}</span></div>`:""}${busy}${les}</div>`}).join("")}
   </div></div>`;
 }
+function weekLessons(off){const ws=weekStart(off),we=new Date(ws);we.setDate(ws.getDate()+6);const a=iso(ws),b=iso(we);return arr(S.lessons).filter(l=>l.date>=a&&l.date<=b&&l.status!=="cancelled").sort((x,y)=>(x.date+(x.time||"")).localeCompare(y.date+(y.time||"")))}
+function weekSummary(off){const L=weekLessons(off),t=today();const done=L.filter(l=>l.status==="done"||l.status==="late").length;const sum=L.reduce((a,l)=>a+(+l.price||0),0);
+  const ws=weekStart(off),mon=new Date(ws);mon.setDate(ws.getDate()+1);const md=iso(mon);const c=typeof rhCfg==="function"?rhCfg():null;const rh=c&&md>=c.start&&md<=(c.end||c.start)?arr(S.rhStudents).filter(x=>x.active!==false).length:0;
+  return `<button class="wsum" data-act="dWeek" data-off="${off}"><span class="wn num">${L.length}</span><span class="wl">שיעורים ${off===0?"השבוע":"בשבוע הזה"}</span><span class="tiny muted">${done} התקיימו · ${L.length-done} נותרו · צפי ${ils(sum)}${rh?` · ועוד ${rh} ברמת השרון`:""}</span></button>`}
+function dWeek(off){const L=weekLessons(off);const ws=weekStart(off);let html="";for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);const ds=iso(d);const dl=L.filter(l=>l.date===ds);if(!dl.length)continue;html+=`<div class="sh" style="margin-top:12px">יום ${DAYS[d.getDay()]} ${fmtD(ds)} · ${dl.length} ${dl.length===1?"שיעור":"שיעורים"}</div>${dl.map(l=>lessonItem(l)).join("")}`}
+  openSheet(sheetHead(`שיעורים · ${fmtD(iso(ws))}`,L.length)+`<div class="list">${html||`<div class="empty">אין שיעורים בשבוע הזה</div>`}</div><button class="btn ghost" data-close>סגירה</button>`)}
 function weekStart(off){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay()+off*7);return d}
 function viewCalendar(){
   const ws=weekStart(weekOffset), t=today();
@@ -693,19 +774,20 @@ function viewCalendar(){
   const total=days.reduce((a,d)=>a+byDay[d].filter(l=>l.status!=="cancelled").length,0);
   return `
   <div class="spread">
-    <div class="row"><button class="btn small" data-act="weekPrev" aria-label="שבוע קודם">→</button><b>${fmtD(days[0])} – ${fmtD(days[6])}</b><button class="btn small" data-act="weekNext" aria-label="שבוע הבא">←</button>${weekOffset?`<button class="btn small ghost" data-act="weekNow">השבוע</button>`:""}</div>
-    <div class="row"><span class="chip acc">${total} שיעורים</span><button class="btn small" data-act="newVacation">חופשה</button><button class="btn primary small" data-act="newLesson">שיעור חדש</button></div>
+    <div class="row"><button class="btn small" data-act="weekPrev">→ שבוע קודם</button><b>${fmtD(days[0])} – ${fmtD(days[6])}</b><button class="btn small primary" data-act="weekNext">שבוע הבא ←</button>${weekOffset?`<button class="btn small ghost" data-act="weekNow">חזרה להשבוע</button>`:""}</div>
+    <div class="row"><button class="btn small" data-act="newVacation">חופשה</button><button class="btn primary small" data-act="newLesson">שיעור חדש</button></div>
   </div>
   <div class="panel" style="padding:10px 12px"><div class="spread"><div style="min-width:0"><b>יומן גוגל</b> <span class="tiny ${G.state==="err"?"neg":"muted"}">${esc(G.msg||"לחץ סנכרון כדי למשוך שיעורים, חופשות וזמנים תפוסים")}</span></div>
     <div class="row">${G.review.length?`<button class="btn small" data-act="gReview">${G.review.length} לבדיקה</button>`:""}<button class="btn small" data-act="gSync" ${G.state==="busy"?"disabled":""}>${G.state==="busy"?"מסנכרן…":"סנכרון"}</button></div></div>
     ${G.vacSug.length?`<div class="list" style="gap:6px;margin-top:8px">${G.vacSug.map((v,i)=>`<div class="alert warn"><div style="flex:1;min-width:0"><b>חופשה? ${esc(v.title.slice(0,40))}</b><span class="tiny">${fmtD(v.from)} עד ${fmtD(v.to)}</span></div><button class="btn small" data-act="vacAdd" data-i="${i}">הוספה כחופשה</button><button class="btn small ghost" data-act="vacIgn" data-i="${i}">לא</button></div>`).join("")}</div>`:""}
   </div>
   <div class="spread"><div class="seg"><button data-act="calMode" data-v="grid" aria-pressed="${calMode==="grid"}">תצוגת שבוע</button><button data-act="calMode" data-v="list" aria-pressed="${calMode==="list"}">רשימה</button></div></div>
-  ${calMode==="grid"?weekGrid(weekOffset):""}
+  ${weekSummary(weekOffset)}
+  ${calMode==="grid"?`<div class="row tiny muted" style="gap:10px"><span><span class="lg reg"></span> תלמיד קבוע</span><span><span class="lg"></span> לא קבוע</span><span><span class="lg od"></span> עבר ולא שולם</span></div>`+weekGrid(weekOffset):""}
   <div class="week" ${calMode==="grid"?"hidden":""}>${days.map(d=>{const ls=byDay[d].sort((a,b)=>(a.time||"").localeCompare(b.time||""));const dd=parseD(d);const vac=vacationOn(d);
     return `<div class="day ${d===t?"today":""}" ${vac?'style="background:var(--warn-soft)"':""}><h3><span>יום ${DAYS[dd.getDay()]} <span class="muted num">${fmtD(d)}</span> ${vac?`<button class="chip warn" style="border:0;cursor:pointer" data-act="editVacation" data-id="${vac.id}">${esc(vac.title||"חופשה")}</button>`:""}</span><button class="btn small ghost" data-act="newLesson" data-date="${d}" aria-label="שיעור חדש ביום ${DAYS[dd.getDay()]}">הוספה</button></h3>
     ${G.busy.filter(b=>b.date===d).map(b=>`<div class="lesson" style="cursor:default;opacity:.75"><span class="time num">${esc(b.from)}</span><span style="flex:1;min-width:0" class="tiny muted">לא פנוי עד <span class="num">${esc(b.to)}</span> · ${esc(b.title.slice(0,40))}</span><span class="chip">תפוס</span></div>`).join("")}
-    ${ls.map(l=>{const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;return `<div class="lesson" role="button" tabindex="0" data-act="editLesson" data-id="${l.id}"><span class="time num">${esc(l.time||"--:--")}</span><span style="flex:1;min-width:0"><b>${esc(studentName(l.studentId)||"תלמיד שנמחק")}</b> <span class="muted tiny">${l.duration||60} דק׳ · ${esc(l.mode||"")}</span>${l.topic?`<br><span class="tiny muted">${esc(l.topic)}</span>`:""}</span><span class="chip ${st[1]}">${st[0]}</span>${settleBtn(l)}</div>`}).join("")}</div>`}).join("")}</div>`;
+    ${ls.map(l=>{const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;return `<div class="lesson${overdueUnpaid(l)?" od":""}" role="button" tabindex="0" data-act="editLesson" data-id="${l.id}"><span class="time num">${esc(l.time||"--:--")}</span><span style="flex:1;min-width:0"><b>${esc(studentName(l.studentId)||"תלמיד שנמחק")}</b> <span class="muted tiny">${l.duration||60} דק׳ · ${esc(l.mode||"")}</span>${l.topic?`<br><span class="tiny muted">${esc(l.topic)}</span>`:""}</span><span class="chip ${st[1]}">${st[0]}</span>${settleBtn(l)}</div>`}).join("")}</div>`}).join("")}</div>`;
 }
 
 function viewMoney(){
@@ -1014,8 +1096,9 @@ async function linkReceipts(){
   const t=today();let n=0;
   const pays=arr(S.payments).filter(p=>p.receiptNo&&p.studentId&&!p.linked&&(+p.amount||0)>0).sort((a,b)=>a.date.localeCompare(b.date));
   for(const p of pays){
+    const tf=S.students[p.studentId]?.trackFrom||"0000";if(p.date<tf)continue;
     const from=iso(new Date(parseD(p.date).getTime()-30*864e5));
-    const cand=arr(S.lessons).filter(l=>l.studentId===p.studentId&&!l.paid&&l.status!=="cancelled"&&l.date>=from).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+    const cand=arr(S.lessons).filter(l=>l.studentId===p.studentId&&!l.paid&&l.status!=="cancelled"&&l.date>=from&&l.date>=tf&&l.date<=t).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
     const past=cand.filter(l=>l.date<=p.date),fut=cand.filter(l=>l.date>p.date);
     let left=+p.amount||0;const ids=[];
     for(const l of past.concat(fut)){const pr=+l.price||0;if(!pr||left<pr)break;left-=pr;ids.push(l.id);
@@ -1138,6 +1221,7 @@ function studentSheet(id){
       <div class="tiny muted" style="margin-top:4px">ייכנס אוטומטית לשיעור הבא שתקבע, ואז יתאפס.</div>
     </div>
     <label class="f">מספר שיעורים מתוכנן (אם התלמיד בא לתקופה מוגבלת)<input type="number" id="s_plan" inputmode="numeric" value="${esc(s.plannedLessons??"")}" placeholder="ריק = בלי הגבלה"></label>
+    <label class="f">תכונות בסיסיות (שורה אחת)<input type="text" id="s_traits" value="${esc(s.traits||"")}" placeholder="למשל: לוחץ מדי, משוחרר מדי, ביישן"></label>
     <label class="f">מטרות והערות<textarea id="s_notes" placeholder="למשל: טווח קול, מטרות, שירים שעובדים עליהם">${esc(s.notes||"")}</textarea></label>
     <label class="row"><input type="checkbox" id="s_active" ${s.active!==false?"checked":""}> תלמיד פעיל</label>
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div>
@@ -1145,7 +1229,7 @@ function studentSheet(id){
     let kind=s.kind||"פרטי";
     r.querySelectorAll("#kindSeg button").forEach(b=>b.onclick=()=>{kind=b.dataset.k;r.querySelectorAll("#kindSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));r.querySelector("#membersWrap").hidden=kind!=="קבוצה"});
     r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const name=val(r,"s_name");if(!name){toast("צריך שם");return}
-      const data={...s,name,kind,members:val(r,"s_members"),phone:val(r,"s_phone"),email:val(r,"s_email"),source:val(r,"s_source"),mode:val(r,"s_mode"),price:+val(r,"s_price")||0,duration:+val(r,"s_dur")||60,notes:val(r,"s_notes"),nextPrice:val(r,"s_nextPrice")===""?null:+val(r,"s_nextPrice"),nextNote:val(r,"s_nextNote"),plannedLessons:val(r,"s_plan")===""?null:+val(r,"s_plan"),active:r.querySelector("#s_active").checked};
+      const data={...s,name,kind,members:val(r,"s_members"),phone:val(r,"s_phone"),email:val(r,"s_email"),source:val(r,"s_source"),mode:val(r,"s_mode"),price:+val(r,"s_price")||0,duration:+val(r,"s_dur")||60,notes:val(r,"s_notes"),traits:val(r,"s_traits"),nextPrice:val(r,"s_nextPrice")===""?null:+val(r,"s_nextPrice"),nextNote:val(r,"s_nextNote"),plannedLessons:val(r,"s_plan")===""?null:+val(r,"s_plan"),active:r.querySelector("#s_active").checked};
       if(!id){data.createdAt=today();data.trackFrom=today()}
       data.autoAdded=false;
       delete data.id;
@@ -1162,13 +1246,17 @@ function studentDetail(id,openTag){
   openSheet(`<div class="spread"><h2>${esc(s.name)}</h2><button class="btn small" data-edit>עריכה</button></div>
   <div class="row">${balanceChip(id)} ${planChip({...s,id})} <span class="chip">${esc(s.source||"")}</span> <span class="chip">${esc(s.mode||"")}</span> ${s.price?`<span class="chip brass">${ils(s.price)} לשיעור</span>`:""}</div>
   <div class="tiny muted">${s.phone?`טלפון <span class="num">${esc(s.phone)}</span> · `:""}${done} שיעורים התקיימו · יתרה <span class="num ${b<0?"neg":b>0?"pos":""}">${b<0?"-":""}${ils(Math.abs(b))}</span>${s.trackFrom?` · נספרת מ־${fmtD(s.trackFrom)}`:""}</div>
+  <label class="f traitf">תכונות בסיסיות<input type="text" id="sd_traits" data-sid="${id}" value="${esc(s.traits||"")}" placeholder="למשל: לוחץ מדי, משוחרר מדי, ביישן"></label>
   ${s.nextPrice!=null?`<div class="alert warn"><div><b>בשיעור הבא: ${ils(s.nextPrice)}</b>${s.nextNote?`<span class="tiny">${esc(s.nextNote)}</span>`:""}</div></div>`:""}
   ${s.notes?`<p class="note" style="margin:0">${esc(s.notes)}</p>`:""}
   ${s.active===false?`<div class="alert"><div><b>לא פעיל${s.inactiveReason?": "+esc(s.inactiveReason):""}</b>${s.inactiveSince?`<span class="tiny">מאז ${fmtD(s.inactiveSince)}</span>`:""}</div></div>`:""}
   <div class="row"><button class="btn primary small" data-newlesson>שיעור חדש</button><button class="btn small" data-newpay>רישום תשלום</button>${s.active===false?`<button class="btn small" data-reactivate>החזרה לפעיל</button>`:`<button class="btn small" data-deactivate>סימון כלא פעיל</button>`}</div>
   <div id="deactBox" hidden class="list" style="gap:8px"><div class="tiny muted">למה?</div><div class="row">${["עזב","סיים את המטרה שלשמה הגיע","הפסקה זמנית","אחר"].map(r=>`<button class="btn small" data-reason="${esc(r)}">${esc(r)}</button>`).join("")}</div></div>
   <h3 style="font-size:1.05rem">התקדמות ושיעורים</h3>
-  <div class="list">${ls.length?ls.map(l=>{const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;return `<button class="item" data-lesson="${l.id}"><div class="main"><div class="t">${fmtD(l.date)} <span class="chip ${st[1]}">${st[0]}</span></div>${(planOf(l)||l.topic)?`<div class="s">על מה עבדנו: ${esc(planOf(l)||l.topic)}</div>`:""}${l.nextPlan?`<div class="s">לשיעור הבא: ${esc(l.nextPlan)}</div>`:""}</div></button>`}).join(""):`<div class="empty">עוד אין שיעורים.</div>`}</div>
+  ${(()=>{const t=today(),row=l=>{const st=LESSON_STATUS[l.status]||LESSON_STATUS.planned;const fut=l.status==="planned";const w=planOf(l)||l.topic;return `<button class="item" data-lesson="${l.id}"><div class="main"><div class="t">${fmtD(l.date)} <span class="chip ${st[1]}">${st[0]}</span></div>${w?`<div class="s">${fut?"נעבוד על":"עבדנו על"}: ${esc(w)}</div>`:""}${l.nextPlan?`<div class="s">לשיעור הבא: ${esc(l.nextPlan)}</div>`:""}</div></button>`};
+    const up=ls.filter(l=>l.date>=t&&l.status==="planned").sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||""))), past=ls.filter(l=>!up.includes(l)).sort((a,b)=>(b.date+(b.time||"")).localeCompare(a.date+(a.time||"")));
+    if(!ls.length)return `<div class="empty">עוד אין שיעורים.</div>`;
+    return `${up.length?`<div class="sh">שיעורים קרובים</div><div class="list">${up.map(row).join("")}</div>`:""}${past.length?`<div class="sh" style="margin-top:10px">שיעורים שהיו</div><div class="list">${past.map(row).join("")}</div>`:""}`})()}
   <h3 style="font-size:1.05rem">תשלומים</h3>
   <div class="list">${ps.length?ps.map(p=>`<div class="item" style="cursor:default"><div class="main"><div class="t num" style="text-align:right">${fmtD(p.date)}</div><div class="s">${esc(payMethodText(p))}</div></div><div class="end"><div class="money num">${ils(p.amount)}</div>${rcptLink(p)}</div></div>`).join(""):`<div class="empty">עוד אין תשלומים.</div>`}</div>
   <button class="btn ghost" data-close>סגירה</button>`,r=>{
@@ -1196,6 +1284,7 @@ function lessonSheet(id,preset={}){
     <div class="grid2"><label class="f">תאריך<input type="date" id="l_date" value="${esc(l.date)}"></label><label class="f">שעה<input type="time" id="l_time" value="${esc(l.time||"")}"></label></div>
     <div class="alert warn" id="nextHint" ${!id&&nextHint(S.students[l.studentId])?"":"hidden"}><div class="tiny" id="nextHintT">${esc(id?"":nextHint(S.students[l.studentId]))}</div></div>
     <div class="alert bad" id="vacHint" ${vacationOn(l.date)?"":"hidden"}><div class="tiny">התאריך הזה נופל על חופשה</div></div>
+    <label class="f">🔔 תזכורת לשיעור הזה<input type="text" id="l_remind" value="${esc(l.remind||"")}" placeholder="למשל: לבקש המלצה"></label>
     ${planFields({...l,id:id||"_new"},"l")}
     <div class="sechd">פרטים</div>
     <label class="f">סטטוס</label>
@@ -1204,7 +1293,7 @@ function lessonSheet(id,preset={}){
     <div class="grid2"><label class="f">משך (דקות)<input type="number" id="l_dur" value="${esc(l.duration||60)}"></label><label class="f">מחיר השיעור<input type="number" id="l_price" value="${esc(l.price??"")}"></label></div>
     <label class="f">מקום<select id="l_mode">${opts(["פרונטלי","זום"],l.mode)}</select></label>
     ${l.gcalTitle?`<div class="tiny muted note">ביומן גוגל: ${esc(l.gcalTitle)}</div>`:""}
-    ${id&&settleInfo(l)?`<button type="button" class="btn primary" data-settle>✓ השיעור התקיים והכסף התקבל</button>`:""}
+    ${id&&settleInfo(l)?`<button type="button" class="btn primary" data-settle>לסמן: השיעור התקיים והכסף התקבל</button>`:""}
     ${id&&l.status==="planned"?`<div class="row">${waButton(S.students[l.studentId]?.phone,lessonMsg({...l,id}),l.reminderSent?"תזכורת נשלחה · שליחה שוב":"שליחת תזכורת בוואטסאפ",`data-sent="${id}"`)}</div>`:""}
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div>
   </form>`,r=>{
@@ -1213,8 +1302,9 @@ function lessonSheet(id,preset={}){
     r.querySelectorAll("#stSeg button").forEach(b=>b.onclick=()=>{status=b.dataset.s;r.querySelectorAll("#stSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
     r.querySelector("#l_student").onchange=e=>{const s=S.students[e.target.value];r.querySelector("#l_phone").value=s?.phone||"";if(s&&!id){r.querySelector("#l_price").value=s.nextPrice??s.price??0;r.querySelector("#l_dur").value=s.duration||60;const h=nextHint(s);r.querySelector("#nextHint").hidden=!h;r.querySelector("#nextHintT").textContent=h}};
     r.querySelector("#l_date").onchange=e=>{r.querySelector("#vacHint").hidden=!vacationOn(e.target.value)};    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();
-      const data={studentId:val(r,"l_student"),date:val(r,"l_date"),time:val(r,"l_time"),duration:+val(r,"l_dur")||60,price:+val(r,"l_price")||0,mode:val(r,"l_mode"),status,plan:val(r,"l_plan"),nextPlan:val(r,"l_next")};
+      const data={studentId:val(r,"l_student"),date:val(r,"l_date"),time:val(r,"l_time"),duration:+val(r,"l_dur")||60,price:+val(r,"l_price")||0,mode:val(r,"l_mode"),status,plan:val(r,"l_plan"),nextPlan:val(r,"l_next"),remind:val(r,"l_remind")};
       if(data.plan&&data.plan===(prevLesson({...data,id:id||"_new"})?.nextPlan||""))data.plan="";
+      await savePrev(r,"l");
       if(id)Object.keys(l).forEach(k=>{if(k!=="id"&&!(k in data))data[k]=l[k]});
       if(!data.date){toast("צריך תאריך");return}
       if(id){data.reminderSent=!!l.reminderSent;if(l.gcalId)data.gcalId=l.gcalId;if(l.gcalTitle)data.gcalTitle=l.gcalTitle}
@@ -1326,17 +1416,19 @@ function vacationSheet(id){
     armDelete(r,()=>remove("vacations",id));
   });
 }
+function regStudent(sid){return arr(S.lessons).some(x=>x.studentId===sid&&/קבוע/.test(x.gcalTitle||""))}
+function isRegular(sid,l){return regStudent(sid)}
+function isRegularOld(sid,l){return arr(S.lessons).some(x=>x.studentId===sid&&x.id!==l.id&&x.status!=="cancelled"&&(()=>{const d=Math.abs(daysBetween(l.date,x.date));return d>0&&d<=28&&d%7===0})())}
 function vacNotifySheet(id,vv,showAll){
   const v=vv||S.vacations[id]; if(!v)return;
   const inVac=arr(S.lessons).filter(l=>l.status==="planned"&&l.date>=v.from&&l.date<=(v.to||v.from));
   const firstLesson={}; inVac.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(l=>{if(!firstLesson[l.studentId])firstLesson[l.studentId]=l});
   const ss=arr(S.students).filter(s=>s.active!==false&&(showAll||firstLesson[s.id])).sort((a,b)=>(!!firstLesson[b.id])-(!!firstLesson[a.id])||a.name.localeCompare(b.name,"he"));
-  const msgFor=s=>{const l=firstLesson[s.id];let m=vacMsg(v,s);if(l){const dd=parseD(l.date);m+=` השיעור שלנו ביום ${DAYS[dd.getDay()]} ${fmtD(l.date)} לא יתקיים, ונקבע מועד אחר.`}return m};
+  const msgFor=s=>{const l=firstLesson[s.id];let m=vacMsg(v,s);if(l){const dd=parseD(l.date);m+=` השיעור שלנו ביום ${DAYS[dd.getDay()]} ${fmtD(l.date)} לא יתקיים${isRegular(s.id,l)?".":", ונקבע מועד אחר."}`}return m};
   openSheet(`<h2>הודעה על ${esc(v.title||"חופשה")}</h2>
   <div class="tiny muted">${fmtD(v.from)} עד ${fmtD(v.to||v.from)} · ${Object.keys(firstLesson).length} תלמידים עם שיעור בתקופה. כל כפתור פותח וואטסאפ עם ההודעה מוכנה.</div>
   <div class="seg"><button data-vshow="0" aria-pressed="${!showAll}">רק מי שיש לו שיעור</button><button data-vshow="1" aria-pressed="${!!showAll}">כל התלמידים</button></div>
-  <div class="list">${ss.length?ss.map(s=>{const l=firstLesson[s.id];return `<div class="item" style="cursor:default"><div class="main"><div class="t">${esc(s.name)}</div><div class="s">${l?"שיעור ב־"+fmtD(l.date)+" "+esc(l.time||""):"אין שיעור בתקופה"}</div></div><div class="end">${waButton(s.phone,msgFor(s),"שליחה")}</div></div>`}).join(""):`<div class="empty">אין תלמידים עם שיעור בתקופה הזו.</div>`}</div>
-  ${ss[0]?`<p class="note tiny" style="margin:0">${esc(msgFor(ss[0]))}</p>`:""}
+  <div class="list">${ss.length?ss.map(s=>{const l=firstLesson[s.id];return `<div class="item" style="cursor:default;flex-wrap:wrap"><div class="main"><div class="t">${esc(s.name)}</div><div class="s">${l?"שיעור ב־"+fmtD(l.date)+" "+esc(l.time||""):"אין שיעור בתקופה"}</div></div><div class="end">${waButton(s.phone,msgFor(s),"שליחה")}</div><p class="note tiny" style="margin:6px 0 0;flex-basis:100%">${esc(msgFor(s))}</p></div>`}).join(""):`<div class="empty">אין תלמידים עם שיעור בתקופה הזו.</div>`}</div>
   <div class="row"><button class="btn primary" data-vnotified>סימון שעדכנתי את כולם</button>${inVac.length?`<button class="btn" data-vcancel>סימון השיעורים כבוטלו</button>`:""}<button class="btn ghost" data-close>סגירה</button></div>`,r=>{
     r.querySelectorAll("[data-vshow]").forEach(b=>b.onclick=()=>vacNotifySheet(id,v,b.dataset.vshow==="1"));
     r.querySelector("[data-vnotified]").onclick=async()=>{if(await save("vacations",id,{...strip({id,...v}),notified:true})!==null){closeSheet();toast("סומן")}};
@@ -1472,14 +1564,19 @@ function payRemSheet(){
 /* ---------- Ramat HaSharon conservatory ---------- */
 const RH_NAME="קונסרבטוריון רמת השרון";
 let rhDate=null;
-function rhCfg(){return {start:"2026-10-26",from:"14:30",to:"20:30",note:"מורה מחליף במקום אלן, לחודשיים בערך",...(S.authorities.rh||{})}}
+let upShowAll=false;
+function rhCfg(){return {start:"2026-10-26",end:"2026-12-21",from:"14:30",to:"20:30",note:"מורה מחליף במקום אלן, לחודשיים בערך",...(S.authorities.rh||{})}}
 function mondayOnOrAfter(d){const x=parseD(d);x.setDate(x.getDate()+((8-x.getDay())%7));return iso(x)}
 function rhLessonId(date,sid){return date+"_"+sid}
 function rhPending(){const t=today();const cfg=rhCfg();return arr(S.rhLessons).filter(l=>l.date<=t&&l.attended!==false&&!l.reported&&l.date>=cfg.start)}
+function rhMondays(){const c=rhCfg();const out=[];const d=parseD(c.start);const e=c.end||c.start;while(iso(d)<=e){out.push(iso(d));d.setDate(d.getDate()+7)}return out}
+function rhPlanOf(sid,date){const l=S.rhLessons[rhLessonId(date,sid)];if(l?.plan)return l.plan;
+  const prev=arr(S.rhLessons).filter(x=>x.sid===sid&&x.date<date&&x.attended!==false).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(prev)return prev.nextPlan||"";return S.rhStudents[sid]?.focus||""}
 function viewRH(){
   const cfg=rhCfg(),t=today();
   if(!rhDate){if(t<cfg.start)rhDate=cfg.start;else{const x=parseD(t);x.setDate(x.getDate()-((x.getDay()+6)%7));rhDate=iso(x)}}
-  const sts=arr(S.rhStudents).filter(s=>s.active!==false).sort((a,b)=>(a.slot||"99").localeCompare(b.slot||"99")||a.name.localeCompare(b.name,"he"));
+  const sts=arr(S.rhStudents).filter(s=>s.active!==false).sort((a,b)=>(a.slot||"99").localeCompare(b.slot||"99")||(+a.order||99)-(+b.order||99)||a.name.localeCompare(b.name,"he"));
   const pend=rhPending();
   const y=t.slice(0,4);const paid=arr(S.payments).filter(p=>p.payer===RH_NAME&&p.date?.startsWith(y)).reduce((a,p)=>a+(+p.amount||0),0);
   const monthL=arr(S.rhLessons).filter(l=>l.date?.startsWith(t.slice(0,7))&&l.attended!==false).length;
@@ -1494,14 +1591,21 @@ function viewRH(){
     <div class="kpi money" role="button" tabindex="0" data-act="rhPay"><div class="l">התקבל מהקונסרבטוריון ${y}</div><div class="v num">${ils(paid)}</div></div>
   </div>
   ${pend.length?`<div class="panel"><h2>ממתינים לדיווח באתר הקונסרבטוריון</h2><div class="list" style="gap:8px">${pend.sort((a,b)=>a.date.localeCompare(b.date)).map(l=>`<div class="alert bad"><div style="flex:1;min-width:0"><b>${esc(S.rhStudents[l.sid]?.name||"?")} · ${fmtD(l.date)}</b><span class="tiny">${l.notes?esc(l.notes.slice(0,90)):"עוד לא נכתב מעקב"}</span></div><button class="btn small" data-act="rhGo" data-d="${l.date}">פתיחה</button></div>`).join("")}</div></div>`:""}
+  <div class="panel"><div class="spread"><h2>לוז · ${fmtD(cfg.start)} עד ${fmtD(cfg.end)}</h2><span class="tiny muted">${rhMondays().length} ימי שני</span></div>
+    <div class="rhsched">${rhMondays().map((d,i)=>{const done=arr(S.rhLessons).filter(l=>l.date===d&&l.attended!==false).length;const rep=arr(S.rhLessons).filter(l=>l.date===d&&l.reported).length;return `<button class="rhday ${d===rhDate?"on":""} ${d<t?"past":""} ${d===t?"today":""}" data-act="rhGo" data-d="${d}"><span class="tiny muted">שיעור ${i+1}</span><b class="num">${fmtD(d).slice(0,5)}</b><span class="tiny">${d<=t?(rep?rep+" דווחו":done?done+" נרשמו":""):""}</span></button>`}).join("")}</div></div>
   <div class="panel">
     <div class="spread"><div class="row"><button class="btn small" data-act="rhPrev" aria-label="שני קודם">→</button><b>יום שני ${fmtD(rhDate)}</b><button class="btn small" data-act="rhNext" aria-label="שני הבא">←</button></div><div class="row"><button class="btn small" data-act="rhReport">טקסט מעקב להעתקה</button><button class="btn small primary" data-act="rhAdd">תלמיד חדש</button></div></div>
     ${rhDate<cfg.start?`<div class="empty">התחלת העבודה ב־${fmtD(cfg.start)}</div>`:""}
-    <div class="list" style="gap:12px;margin-top:10px">${sts.length?sts.map(st=>{const l=S.rhLessons[rhLessonId(rhDate,st.id)]||{};const att=l.attended!==false;
+    <div class="list" style="gap:12px;margin-top:10px">${sts.length?sts.map((st,ix)=>{const l=S.rhLessons[rhLessonId(rhDate,st.id)]||{};const att=l.attended!==false;
       return `<div class="rhcard ${att?"":"absent"}" data-sid="${st.id}">
-        <div class="spread"><div><b class="rhname">${esc(st.name)}</b> <span class="tiny muted">${esc(st.instrument||"")}${st.slot?" · <span class=\"num\">"+esc(st.slot)+"</span>":""}</span></div>
+        <div class="spread"><div><span class="rhnum num">${ix+1}</span><b class="rhname">${esc(st.name)}</b> <span class="tiny muted">${esc(st.instrument||"")}${st.slot?" · <span class=\"num\">"+esc(st.slot)+(st.slotEnd?"–"+esc(st.slotEnd):"")+"</span>":""}${st.place?" · "+esc(st.place):""}</span></div>
         <div class="row"><div class="seg" style="padding:3px"><button data-rh="att" data-v="1" aria-pressed="${att}">הגיע</button><button data-rh="att" data-v="0" aria-pressed="${!att}">לא הגיע</button></div><button class="btn small ghost" data-act="rhEditStudent" data-id="${st.id}">עריכה</button></div></div>
-        <textarea data-rh="notes" placeholder="מעקב התקדמות: על מה עבדנו, מה השתפר, מה לתרגל" ${att?"":"disabled"}>${esc(l.notes||"")}</textarea>
+        <input type="text" class="rhtrait" data-sid="${st.id}" value="${esc(st.traits||"")}" placeholder="תכונות בסיסיות: לוחץ מדי, משוחרר מדי…">
+        ${st.notes?`<details class="rhbg"><summary class="tiny">רקע על התלמיד</summary><div class="tiny" style="white-space:pre-line;margin-top:4px">${esc(st.notes)}</div></details>`:""}
+        <label class="f rhplan">נעבוד על<textarea data-rh="plan" placeholder="מה הטכניקה שצריך לשפר בשיעור הזה">${esc(rhPlanOf(st.id,rhDate))}</textarea></label>
+        ${st.song?`<div class="tiny muted" style="margin:-2px 0 6px">שיר: ${esc(st.song)}</div>`:""}
+        <label class="f">מה עשינו (למעקב באתר)<textarea data-rh="notes" placeholder="על מה עבדנו, מה השתפר, מה לתרגל" ${att?"":"disabled"}>${esc(l.notes||"")}</textarea></label>
+        <label class="f">לשיעור הבא · על מה נעבוד<textarea data-rh="next" placeholder="יופיע אוטומטית ב'נעבוד על' בשיעור הבא">${esc(l.nextPlan||"")}</textarea></label>
         <label class="row tiny"><input type="checkbox" data-rh="rep" ${l.reported?"checked":""}> דווח באתר הקונסרבטוריון</label>
       </div>`}).join(""):`<div class="empty">עוד אין תלמידים. הוסף אותם עם "תלמיד חדש".</div>`}</div>
   </div>`;
@@ -1512,11 +1616,13 @@ function rhStudentSheet(id){
   openSheet(`<h2>${id?"עריכת תלמיד":"תלמיד חדש · רמת השרון"}</h2><form id="f" class="list" style="gap:10px">
     <label class="f">שם<input type="text" id="r_name" value="${esc(st.name||"")}"></label>
     <div class="grid2"><label class="f">כלי או תחום<input type="text" id="r_inst" value="${esc(st.instrument||"פיתוח קול")}"></label><label class="f">שעה קבועה<input type="time" id="r_slot" value="${esc(st.slot||"")}"></label></div>
-    <label class="f">הערות<textarea id="r_notes">${esc(st.notes||"")}</textarea></label>
+    <label class="f">מה צריך לשפר (טכניקה) · יופיע ב"נעבוד על" בשיעור הראשון<textarea id="r_focus">${esc(st.focus||"")}</textarea></label>
+    <label class="f">שיר שעובדים עליו<input type="text" id="r_song" value="${esc(st.song||"")}"></label>
+    <label class="f">רקע על התלמיד<textarea id="r_notes">${esc(st.notes||"")}</textarea></label>
     <label class="row"><input type="checkbox" id="r_active" ${st.active!==false?"checked":""}> פעיל</label>
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div></form>`,r=>{
     r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const name=val(r,"r_name");if(!name){toast("צריך שם");return}
-      if(await save("rhStudents",id,{name,instrument:val(r,"r_inst"),slot:val(r,"r_slot"),notes:val(r,"r_notes"),active:r.querySelector("#r_active").checked})!==null){closeSheet();toast("נשמר")}};
+      if(await save("rhStudents",id,{...(id?strip({id,...st}):{}),name,instrument:val(r,"r_inst"),slot:val(r,"r_slot"),notes:val(r,"r_notes"),focus:val(r,"r_focus"),song:val(r,"r_song"),active:r.querySelector("#r_active").checked})!==null){closeSheet();toast("נשמר")}};
     armDelete(r,()=>remove("rhStudents",id));
   });
 }
@@ -1568,6 +1674,8 @@ document.addEventListener("click",async e=>{
     case "newLesson":lessonSheet(null,a.dataset.date?{date:a.dataset.date}:{});break;
     case "editLesson":lessonSheet(id);break;
     case "planLesson":planSheet(id);break;
+    case "dWeek":dWeek(+a.dataset.off||0);break;
+    case "upAll":upShowAll=!upShowAll;render();break;
     case "settle":settleSheet(id);break;
     case "newPayment":paymentSheet();break;
     case "editPayment":paymentSheet(id);break;
@@ -1627,8 +1735,12 @@ document.addEventListener("click",async e=>{
     case "exportCpa":finYear=cpaYear;exportYear();break;
   }
 });
-document.addEventListener("change",e=>{const rc=e.target.closest(".rhcard");if(rc&&e.target.dataset.rh){const sid=rc.dataset.sid;
+document.addEventListener("change",e=>{if(e.target.id==="sd_traits"){const sid=e.target.dataset.sid,st=S.students[sid];if(st){save("students",sid,{...st,traits:e.target.value.trim()});toast("נשמר")}return}
+  if(e.target.classList.contains("rhtrait")){const sid=e.target.dataset.sid;const st=S.rhStudents[sid];if(st){save("rhStudents",sid,{...st,traits:e.target.value.trim()});toast("נשמר")}return}
+const rc=e.target.closest(".rhcard");if(rc&&e.target.dataset.rh){const sid=rc.dataset.sid;
     if(e.target.dataset.rh==="notes")rhSave(sid,{notes:e.target.value});
+    if(e.target.dataset.rh==="plan")rhSave(sid,{plan:e.target.value});
+    if(e.target.dataset.rh==="next")rhSave(sid,{nextPlan:e.target.value});
     if(e.target.dataset.rh==="rep"){rhSave(sid,{reported:e.target.checked});toast(e.target.checked?"סומן כדווח":"בוטל הסימון")}return}
 const c=e.target.closest("[data-cpa]");if(c){saveCpa(c.dataset.cpa,{done:c.checked});return}const m=e.target.closest("[data-cpaamt]");if(m){saveCpa(m.dataset.cpaamt,{amount:m.value===""?null:+m.value})}});
 document.getElementById("quickExpense").addEventListener("change",e=>{const f=e.target.files?.[0];e.target.value="";if(f)expenseSheet(null,f)});
