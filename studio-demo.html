@@ -989,7 +989,7 @@ function viewHome(){
   <div class="tiles">
   <div class="panel">
     <div class="spread"><h2>דורש תשומת לב</h2>${al.length?`<span class="chip warn">${al.length}</span>`:""}</div>
-    <div class="scroll"><div class="list" style="gap:8px">${al.length?al.map(a=>`<div class="alert ${a.k}"><div style="flex:1;min-width:0"><b>${a.sid&&studentName(a.sid)?esc(a.t).replace(esc(studentName(a.sid)),sl(a.sid,esc(studentName(a.sid)))):esc(a.t)}</b><span class="tiny">${a.sh||esc(a.s)}</span></div>${a.ypay?`<a class="btn small" href="${YPAY_URL}" target="_blank" rel="noopener">לוויי־פיי</a>`:""}${a.vac?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="vacNotify" data-id="${a.vac}">הודעה לתלמידים</button>`:""}${a.go?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="${a.go[0]}"${a.goId?` data-id="${a.goId}"`:""}>${a.go[1]}</button>`:""}${a.wa?waButton(a.wa[0],a.wa[1],a.waLabel||"שליחה בוואטסאפ","",a.waSid||a.goId||"",a.waKey||""):""}</div>`).join(""):`<div class="alert ok"><div><b>הכול מסודר</b><span class="tiny">אין חובות, תזכורות קרובות או תשלומים בלי קבלה</span></div></div>`}</div></div>
+    <div class="scroll"><div class="list" style="gap:8px">${al.length?al.map(a=>`<div class="alert ${a.k}"><div style="flex:1;min-width:0"><b>${a.sid&&studentName(a.sid)?esc(a.t).replace(esc(studentName(a.sid)),sl(a.sid,esc(studentName(a.sid)))):esc(a.t)}</b><span class="tiny">${a.sh||esc(a.s)}</span></div>${a.ypay?`<button type="button" class="btn small" data-act="rcptSite">לאתר הקבלות</button>`:""}${a.vac?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="vacNotify" data-id="${a.vac}">הודעה לתלמידים</button>`:""}${a.go?`<button class="btn small" style="color:inherit;border-color:currentColor" data-act="${a.go[0]}"${a.goId?` data-id="${a.goId}"`:""}>${a.go[1]}</button>`:""}${a.wa?waButton(a.wa[0],a.wa[1],a.waLabel||"שליחה בוואטסאפ","",a.waSid||a.goId||"",a.waKey||""):""}</div>`).join(""):`<div class="alert ok"><div><b>הכול מסודר</b><span class="tiny">אין חובות, תזכורות קרובות או תשלומים בלי קבלה</span></div></div>`}</div></div>
   </div>
   ${remindPanel}
   ${(()=>{const n=growthCount();return `<button class="panel" data-act="growth" style="text-align:right;cursor:pointer;font:inherit;color:inherit;width:100%"><div class="spread"><h2 style="margin:0">צמיחה · עוד תלמידים</h2>${n?`<span class="chip warn">${n}</span>`:`<span class="chip ok">✓</span>`}</div><div class="tiny muted" style="margin-top:6px">להחזיר לא פעילים, לבקש המלצות, חבר מביא חבר, ומשימת שיווק לשבוע</div></button>`})()}
@@ -1006,7 +1006,7 @@ function viewHome(){
     <button class="btn small" data-act="newExpense">רישום הוצאה</button>
     <button class="btn small" data-act="newStudent">תלמיד חדש</button>
     <button class="btn small" data-act="newVacation">חופשה</button>
-    <a class="btn small" href="${YPAY_URL}" target="_blank" rel="noopener">🧾 הפקת קבלה בוויי־פיי</a>
+    <button type="button" class="btn small" data-act="rcptSite">🧾 הפקת קבלה</button>
   </div>
 `;
 }
@@ -2467,7 +2467,7 @@ document.addEventListener("click",async e=>{
   const id=a.dataset.id;
   render._keep=true;
   switch(a.dataset.act){
-    case "addMenu":openSheet(`<h2>מה להוסיף?</h2><div class="list">${[["newLesson","שיעור"],["newPayment","תשלום"],["newExpense","הוצאה"],["newStudent","תלמיד או קבוצה"],["newVacation","חופשה"],["newReminder","תזכורת"]].map(([k,t])=>`<button class="item" data-act="${k}"><div class="main"><div class="t">${t}</div></div><span class="muted">←</span></button>`).join("")}</div><a class="btn" href="${YPAY_URL}" target="_blank" rel="noopener">הפקת קבלה בוויי־פיי</a>`);break;
+    case "addMenu":openSheet(`<h2>מה להוסיף?</h2><div class="list">${[["newLesson","שיעור"],["newPayment","תשלום"],["newExpense","הוצאה"],["newStudent","תלמיד או קבוצה"],["newVacation","חופשה"],["newReminder","תזכורת"]].map(([k,t])=>`<button class="item" data-act="${k}"><div class="main"><div class="t">${t}</div></div><span class="muted">←</span></button>`).join("")}</div><button type="button" class="btn" data-act="rcptSite">🧾 הפקת קבלה</button>`);break;
     case "newStudent":studentSheet();break;
     case "openStudent":studentDetail(id);break;
     case "tagActive":studentDetail(id,true);break;
@@ -2587,6 +2587,25 @@ setInterval(()=>{if(!dlg.open&&(tab==='home'||tab==='calendar')){render._keep=tr
 if(window.claude?.hot?.ready)window.claude.hot.ready(start);else start();
 </script>
 
-
+<script>
+(function(){
+  const SITES=[["חשבונית ירוקה (מורנינג)","https://www.greeninvoice.co.il"],["איקאונט","https://www.icount.co.il"],["איזיקאונט","https://www.ezcount.co.il"],["ריווחית","https://www.rivhit.co.il"]];
+  const get=()=>{try{return localStorage.getItem("rcptSite")||""}catch(_){return ""}};
+  const set=v=>{try{localStorage.setItem("rcptSite",v)}catch(_){}};
+  function pick(){
+    const cur=get();
+    openSheet(`<h2>הפקת קבלה</h2><p class="tiny muted" style="margin:0">באיזה אתר אתה מפיק קבלות? הבחירה נשמרת בדפדפן, ובפעם הבאה הכפתור יפתח אותו ישר.</p>
+      <div class="skinlist">${SITES.map(([n,u])=>`<button type="button" class="skinopt ${u===cur?"on":""}" data-site="${u}"><span class="sk"><b>${n}</b><span class="tiny muted">${u.replace("https://","")}</span></span></button>`).join("")}</div>
+      <label class="f">אתר אחר<input type="text" id="rc_url" placeholder="למשל: https://..." value="${cur&&!SITES.some(x=>x[1]===cur)?cur:""}"></label>
+      <div class="row"><button class="btn primary" type="button" id="rc_save">שמירה ופתיחה</button></div>`,r=>{
+      r.querySelectorAll("[data-site]").forEach(b=>b.onclick=()=>{set(b.dataset.site);closeSheet();window.open(b.dataset.site,"_blank","noopener")});
+      r.querySelector("#rc_save").onclick=()=>{let v=r.querySelector("#rc_url").value.trim();if(!v){toast("בחר אתר או כתוב כתובת");return}if(!v.startsWith("http"))v="https://"+v;set(v);closeSheet();window.open(v,"_blank","noopener")};
+    });
+  }
+  document.addEventListener("click",e=>{const b=e.target.closest('[data-act="rcptSite"]');if(!b)return;e.preventDefault();e.stopPropagation();
+    const u=get(); if(u&&!e.altKey){window.open(u,"_blank","noopener");toast("לשינוי האתר: לחיצה ארוכה על הכפתור");return} pick()},true);
+  document.addEventListener("contextmenu",e=>{const b=e.target.closest('[data-act="rcptSite"]');if(!b)return;e.preventDefault();pick()},true);
+})();
+</script>
 </body>
 </html>
