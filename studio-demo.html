@@ -485,6 +485,27 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 .item:focus:not(:focus-visible),.btn:focus:not(:focus-visible),.kpi:focus:not(:focus-visible){outline:none}
 .item.od:hover{background:var(--red-soft)!important}
 .rhday.off{border-style:dashed;opacity:1}.rhday.off b{text-decoration:line-through;color:var(--muted)}.rhwhy{color:var(--red);font-weight:600;line-height:1.3;display:block;text-align:center}
+
+/* app title + theme button */
+.apptitle{display:flex;align-items:center;gap:8px}
+.titleedit{border:0;background:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 6px;border-radius:8px;line-height:1}
+.titleedit:hover{color:var(--accent);background:var(--accent-soft)}
+.skinbtn{position:fixed;inset-inline-end:10px;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:22;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow-lg);font-size:1.25rem;cursor:pointer;display:grid;place-items:center}
+@media (min-width:760px){.skinbtn{bottom:24px}}
+.skinlist{display:flex;flex-direction:column;gap:10px}
+.skinopt{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);cursor:pointer;text-align:right;font:inherit}
+.skinopt.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.skinopt .sw{display:flex;flex:none}.skinopt .sw i{width:22px;height:40px;display:block}.skinopt .sw i:first-child{border-radius:0 8px 8px 0}.skinopt .sw i:last-child{border-radius:8px 0 0 8px}
+.skinopt .sk{display:flex;flex-direction:column;flex:1;min-width:0}
+/* skins */
+:root[data-skin="indigo"]{--bg:#F6F9FC;--surface:#FFFFFF;--sunk:#EEF2F8;--ink:#0A2540;--ink2:#334B66;--muted:#6B7C93;--line:#E3E8EF;--line2:#EDF1F6;--accent:#635BFF;--accent-ink:#FFFFFF;--accent-soft:#EEEDFF;--accent-strong:#4B44D6;--ok:#4B44D6;--ok-soft:#EEEDFF;--warn:#0A2540;--warn-soft:#E7EAFB;--bad:#FFFFFF;--bad-soft:#4B44D6;--neg:#4B44D6;color-scheme:light}
+:root[data-skin="vivid"]{--bg:#FFF5FA;--surface:#FFFFFF;--sunk:#FCEAF3;--ink:#2A1033;--ink2:#53305E;--muted:#8E6E98;--line:#F4D9E8;--line2:#FAE8F1;--accent:#D6336C;--accent-ink:#FFFFFF;--accent-soft:#FFE3EE;--accent-strong:#7C3AED;--ok:#7C3AED;--ok-soft:#F1E8FF;--warn:#B4235A;--warn-soft:#FFE3EE;--bad:#FFFFFF;--bad-soft:#7C3AED;--neg:#B4235A;color-scheme:light}
+:root[data-skin="vivid"] .upnext .item{border-inline-start-color:#7C3AED}
+:root[data-skin="vivid"] .kpi:nth-child(4n+1){border-top:3px solid #D6336C}:root[data-skin="vivid"] .kpi:nth-child(4n+2){border-top:3px solid #7C3AED}:root[data-skin="vivid"] .kpi:nth-child(4n+3){border-top:3px solid #F59E0B}:root[data-skin="vivid"] .kpi:nth-child(4n+4){border-top:3px solid #10B981}
+:root[data-skin="warm"]{--bg:#FBF8F3;--surface:#FFFDF9;--sunk:#F3EDE3;--ink:#3D2B1F;--ink2:#5E4636;--muted:#9A8373;--line:#EBE2D4;--line2:#F2EBE0;--accent:#B4562D;--accent-ink:#FFFFFF;--accent-soft:#F7E6DA;--accent-strong:#8A3F1F;--ok:#5F7A3A;--ok-soft:#ECF1E2;--warn:#8A3F1F;--warn-soft:#F7E6DA;--bad:#FFFFFF;--bad-soft:#8A3F1F;--neg:#8A3F1F;color-scheme:light}
+:root[data-skin="mint"]{--bg:#F2FAF7;--surface:#FFFFFF;--sunk:#E5F4EE;--ink:#0D2A22;--ink2:#2E4F45;--muted:#6C8A80;--line:#D7EDE4;--line2:#E6F4EE;--accent:#0F9F74;--accent-ink:#FFFFFF;--accent-soft:#DDF4EA;--accent-strong:#0B5E46;--ok:#0B5E46;--ok-soft:#DDF4EA;--warn:#0B5E46;--warn-soft:#DDF4EA;--bad:#FFFFFF;--bad-soft:#0B5E46;--neg:#0B5E46;color-scheme:light}
+:root[data-skin="mono"]{--bg:#F5F5F7;--surface:#FFFFFF;--sunk:#EFEFF2;--ink:#1D1D1F;--ink2:#3A3A3C;--muted:#86868B;--line:#E2E2E6;--line2:#EDEDF0;--accent:#1D1D1F;--accent-ink:#FFFFFF;--accent-soft:#EDEDF0;--accent-strong:#000000;--ok:#1D1D1F;--ok-soft:#EDEDF0;--warn:#1D1D1F;--warn-soft:#EDEDF0;--bad:#FFFFFF;--bad-soft:#1D1D1F;--neg:#1D1D1F;color-scheme:light}
+:root[data-skin="night"]{--bg:#0B0D12;--surface:#14161C;--sunk:#1B1E26;--ink:#ECEEF4;--ink2:#C2C6D2;--muted:#8A90A0;--line:#252935;--line2:#1E222C;--accent:#8B93FF;--accent-ink:#0B0D12;--accent-soft:#1F2340;--accent-strong:#B6BBFF;--ok:#8B93FF;--ok-soft:#1A1E35;--warn:#B6BBFF;--warn-soft:#1F2340;--bad:#0B0D12;--bad-soft:#B6BBFF;--neg:#B6BBFF;--red:#FF8A80;--red-soft:#3A1F22;--shadow:0 1px 2px rgb(0 0 0 / .4);--shadow-lg:0 12px 40px rgb(0 0 0 / .6);color-scheme:dark}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -492,7 +513,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
   <p class="thanks">״וְזָכַרְתָּ אֶת ה׳ אֱלֹהֶיךָ כִּי הוּא הַנֹּתֵן לְךָ כֹּחַ לַעֲשׂוֹת חָיִל״ <span class="src">(דברים ח, יח)</span><br>״פּוֹתֵחַ אֶת יָדֶךָ וּמַשְׂבִּיעַ לְכָל חַי רָצוֹן״ <span class="src">(תהילים קמה, טז)</span></p>
   <header class="top">
     <div>
-      <h1>יומן הסטודיו</h1>
+      <h1 class="apptitle"><span id="appTitle">יומן הסטודיו</span><button type="button" class="titleedit" data-act="editTitle" aria-label="שינוי שם האפליקציה" title="שינוי שם">✎</button></h1>
       <div class="sub" id="todayLine">פיתוח קול</div>
     </div>
     <div class="row" style="position:relative"><button class="btn small" data-act="chat">שאל את העוזר</button><div class="sync" id="syncState">מתחבר לנתונים…</div></div>
@@ -509,6 +530,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
   </nav>
 
   <main id="view"></main>
+  <button type="button" class="skinbtn" data-act="skins" aria-label="שינוי עיצוב" title="שינוי עיצוב">🎨</button>
 </div>
 
 <input type="file" id="quickExpense" accept="image/*,application/pdf" hidden>
@@ -810,6 +832,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(render._pending&&!ed
 function render(){
   if(!render._focusSearch&&editingNow()){render._pending=true;return}
   const tl=document.getElementById("todayLine"); if(tl)tl.textContent=todayText();
+  {const at=document.getElementById("appTitle");if(at){if(!at.dataset.def)at.dataset.def=at.textContent;const v=S.authorities.settings?.appTitle||at.dataset.def;if(at.textContent!==v)at.textContent=v;if(!document.title.includes("דמו"))document.title=v}}
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===tab)));
   const v=$("#view");
   const scroll=window.scrollY;
@@ -1811,6 +1834,28 @@ const dlg=$("#dlg"), sheet=$("#sheet");
 let _lockY=0;
 function lockBg(){if(document.body.classList.contains("sheetlock"))return;_lockY=window.scrollY;document.body.style.top=(-_lockY)+"px";document.body.classList.add("sheetlock")}
 function unlockBg(){if(!document.body.classList.contains("sheetlock"))return;document.body.classList.remove("sheetlock");document.body.style.top="";window.scrollTo(0,_lockY)}
+/* ---------- עיצובים ---------- */
+const SKINS=[
+  {id:"",name:"קלאסי",desc:"כחול רגוע, כמו שהיה",sw:["#F3F6F9","#3D6C93","#24496A"]},
+  {id:"indigo",name:"מקצועי",desc:"סגול־כחול בהיר ונקי, בהשראת ממשקי פינטק",sw:["#F6F9FC","#635BFF","#0A2540"]},
+  {id:"vivid",name:"צבעוני",desc:"ורוד־סגול עם הרבה חיות",sw:["#FFF5FA","#D6336C","#7C3AED"]},
+  {id:"warm",name:"חם וטבעי",desc:"נייר שמנת ואדמה, בהשראת מחברות",sw:["#FBF8F3","#B4562D","#3D2B1F"]},
+  {id:"mint",name:"מנטה",desc:"ירוק רענן ושקט",sw:["#F2FAF7","#0F9F74","#0B5E46"]},
+  {id:"mono",name:"מינימלי",desc:"שחור־לבן אלגנטי, בלי הסחות",sw:["#F5F5F7","#1D1D1F","#6E6E73"]},
+  {id:"night",name:"לילה",desc:"כהה ומודרני, נוח בערב",sw:["#0B0D12","#8B93FF","#14161C"]}
+];
+function skinGet(){try{return localStorage.getItem("skin")||""}catch(_){return ""}}
+function skinApply(id){const r=document.documentElement;if(id)r.dataset.skin=id;else delete r.dataset.skin;
+  if(id==="night")r.dataset.theme="dark";else if(id)r.dataset.theme="light";else delete r.dataset.theme}
+skinApply(skinGet());
+function skinsSheet(){const cur=skinGet();
+  openSheet(`<h2>בחירת עיצוב</h2><p class="tiny muted" style="margin:0">העיצוב נשמר במכשיר הזה.</p><div class="skinlist">${SKINS.map(k=>`<button type="button" class="skinopt ${k.id===cur?"on":""}" data-skin="${k.id}"><span class="sw">${k.sw.map(c=>`<i style="background:${c}"></i>`).join("")}</span><span class="sk"><b>${k.name}</b><span class="tiny muted">${k.desc}</span></span>${k.id===cur?'<span class="chip ok">פעיל</span>':""}</button>`).join("")}</div>`,
+  r=>r.querySelectorAll("[data-skin]").forEach(b=>b.onclick=()=>{const id=b.dataset.skin;try{localStorage.setItem("skin",id)}catch(_){}skinApply(id);skinsSheet()}))}
+function titleSheet(){const at=document.getElementById("appTitle");const def=at?.dataset.def||"יומן הסטודיו";const cur=S.authorities.settings?.appTitle||def;
+  openSheet(`<h2>שם האפליקציה</h2><form id="f" class="sec" style="gap:12px"><label class="f">השם שיופיע בראש המסך<input type="text" id="t_name" maxlength="40" value="${esc(cur)}"></label><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" id="t_reset">חזרה לשם המקורי</button></div></form>`,
+  r=>{r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const v=r.querySelector("#t_name").value.trim();if(!v){toast("צריך שם");return}
+      if(await save("authorities","settings",{...(S.authorities.settings||{}),appTitle:v})!==null){S.authorities.settings={...(S.authorities.settings||{}),appTitle:v};closeSheet();render();toast("השם עודכן")}};
+    r.querySelector("#t_reset").onclick=async()=>{const st={...(S.authorities.settings||{})};delete st.appTitle;if(await save("authorities","settings",st)!==null){S.authorities.settings=st;closeSheet();render();toast("חזר לשם המקורי")}}})}
 function openSheet(html,bind){sheet.innerHTML=`<div class="sheetbar"><button type="button" class="sheetclose" data-sheetclose aria-label="סגירה וחזרה">✕ סגירה</button></div>`+html;sheet.querySelector("[data-sheetclose]").onclick=()=>closeSheet();sheet.scrollTop=0;if(!dlg.open)dlg.showModal();lockBg();bind&&bind(sheet);const f=sheet.querySelector("input,select,textarea");if(f&&window.innerWidth>760)f.focus()}
 function closeSheet(){dlg.close();unlockBg()}
 dlg.addEventListener("close",unlockBg);
@@ -2468,6 +2513,8 @@ document.addEventListener("click",async e=>{
     case "history":historySheet(id);break;
     case "noMethod":dUnspec();break;
     case "rhHistory":rhHistorySheet(id);break;
+    case "skins":skinsSheet();break;
+    case "editTitle":titleSheet();break;
     case "doneUnpaid":{const lid0=a.dataset.id,l=S.lessons[lid0];if(l){await save("lessons",lid0,{...strip(l),status:"done",paid:false});render();toast(`סומן שהתקיים. נכנס לחובות: ${ils(+l.price||0)}`)}break}
     case "markDone":{const lid0=a.dataset.id,l=S.lessons[lid0];if(l){await save("lessons",lid0,{...strip(l),status:"done",paid:true});render();toast("סומן שהתקיים")}break}
     case "cpaRemDone":{const r=G.cpaRem[+a.dataset.i];if(r){const cur=S.authorities.settings||{};await save("authorities","settings",{...cur,cpaRemDone:[...(cur.cpaRemDone||[]),r.id].slice(-500)});G.cpaRem.splice(+a.dataset.i,1);render();toast("סומן כבוצע")}break}
