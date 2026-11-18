@@ -440,14 +440,32 @@ button.alert.bad .ckgo{color:inherit}
 .pc-row .r{white-space:nowrap}
 .pc-row.tot{border-top:1px solid var(--line);margin-top:4px;padding-top:4px;font-weight:600}
 .pc-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+</style><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* demo typography */
+:root{--display:"Rubik","Heebo",system-ui,sans-serif;--body:"Rubik","Heebo",system-ui,sans-serif}
+html{font-size:15px}
+body{font-size:15px;line-height:1.55;letter-spacing:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+header.top h1{font-family:var(--display);font-weight:700;font-size:1.75rem;letter-spacing:-.01em}
+h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spacing:-.005em}
+.panel h2{font-size:1.08rem}
+.kpi .l,.split .l,.fl{font-weight:500;letter-spacing:0}
+.kpi .v,.split .v,.fv,.wsum .wn,.pc-amt,.ttime,.rhname{font-family:var(--display)!important;font-weight:600!important;letter-spacing:-.01em}
+.item .t,.tname{font-weight:600}
+.item .s,.tmeta,.muted,.tiny{color:var(--muted)}
+.btn{font-weight:500}
+.ev b{font-family:var(--body)!important;font-weight:600!important}
+.tg .hd .dn{font-family:var(--display)!important;font-weight:600!important}
+
 </style>
+
 
 <div class="wrap">
   <div class="blessing" aria-label="בשם השם נעשה ונצליח"><span class="orn" aria-hidden="true"></span><span class="bt-text">בְּשֵׁם הַשֵּׁם נַעֲשֶׂה וְנַצְלִיחַ</span><span class="orn" aria-hidden="true"></span></div>
   <p class="thanks">״וְזָכַרְתָּ אֶת ה׳ אֱלֹהֶיךָ כִּי הוּא הַנֹּתֵן לְךָ כֹּחַ לַעֲשׂוֹת חָיִל״ <span class="src">(דברים ח, יח)</span><br>״פּוֹתֵחַ אֶת יָדֶךָ וּמַשְׂבִּיעַ לְכָל חַי רָצוֹן״ <span class="src">(תהילים קמה, טז)</span></p>
   <header class="top">
     <div>
-      <h1>יומן הסטודיו של דור</h1>
+      <h1>יומן הסטודיו</h1>
       <div class="sub" id="todayLine">פיתוח קול</div>
     </div>
     <div class="row" style="position:relative"><button class="btn small" data-act="chat">שאל את העוזר</button><div class="sync" id="syncState">מתחבר לנתונים…</div></div>
