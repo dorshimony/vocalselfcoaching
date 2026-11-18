@@ -466,6 +466,24 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 .tg .hd .dn{font-family:var(--display)!important;font-weight:600!important}
 .tip>button.tipq{width:auto!important;height:auto!important;border-radius:9px!important;padding:6px 10px!important;font-size:.8rem!important;border:1px dashed var(--line)!important}
 .quick .btn{min-height:38px}
+
+/* close button at the top of every window */
+.sheetbar{position:sticky;top:-10px;z-index:5;display:flex;justify-content:flex-end;margin:-6px -6px -8px;padding:6px 6px 0;background:linear-gradient(var(--surface) 70%,transparent)}
+@media (min-width:760px){.sheetbar{top:-22px}}
+.sheetclose{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+.sheetclose:hover{border-color:var(--accent);color:var(--accent-strong)}
+/* touch screens: no "stuck" hover colour after a tap */
+@media (hover:none){
+  .item:hover,.upnext .item:hover{background:var(--surface)}
+  .item:not(.upnext .item):hover{background:none}
+  .btn:hover{background:var(--surface);border-color:var(--line)}
+  .btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+  .btn.ghost:hover{background:transparent}
+  .btn.settle:hover{background:var(--surface);color:var(--accent-strong)}
+  .kpi[role=button]:hover,.split .sp:hover,button.alert:hover{background:inherit;border-color:var(--line);filter:none}
+}
+.item:focus:not(:focus-visible),.btn:focus:not(:focus-visible),.kpi:focus:not(:focus-visible){outline:none}
+.item.od:hover{background:var(--red-soft)!important}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -1792,7 +1810,7 @@ const dlg=$("#dlg"), sheet=$("#sheet");
 let _lockY=0;
 function lockBg(){if(document.body.classList.contains("sheetlock"))return;_lockY=window.scrollY;document.body.style.top=(-_lockY)+"px";document.body.classList.add("sheetlock")}
 function unlockBg(){if(!document.body.classList.contains("sheetlock"))return;document.body.classList.remove("sheetlock");document.body.style.top="";window.scrollTo(0,_lockY)}
-function openSheet(html,bind){sheet.innerHTML=html;sheet.scrollTop=0;if(!dlg.open)dlg.showModal();lockBg();bind&&bind(sheet);const f=sheet.querySelector("input,select,textarea");if(f&&window.innerWidth>760)f.focus()}
+function openSheet(html,bind){sheet.innerHTML=`<div class="sheetbar"><button type="button" class="sheetclose" data-sheetclose aria-label="סגירה וחזרה">✕ סגירה</button></div>`+html;sheet.querySelector("[data-sheetclose]").onclick=()=>closeSheet();sheet.scrollTop=0;if(!dlg.open)dlg.showModal();lockBg();bind&&bind(sheet);const f=sheet.querySelector("input,select,textarea");if(f&&window.innerWidth>760)f.focus()}
 function closeSheet(){dlg.close();unlockBg()}
 dlg.addEventListener("close",unlockBg);
 dlg.addEventListener("click",e=>{if(e.target===dlg)closeSheet()});
