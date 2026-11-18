@@ -1,0 +1,27 @@
+# Studio Ledger — bug log
+
+Bugs found in the studio management app (production and demo) and how each was fixed.
+Severity: **Critical** = wrong money data · **High** = wrong lesson/student data · **Medium** = broken flow · **Low** = UI/UX.
+
+| # | Date found | Severity | Area | Bug | Root cause | Fix | Verified by |
+|---|---|---|---|---|---|---|---|
+| 1 | 2026-11-03 | High | Calendar sync | A paid lesson moved in Google Calendar showed twice (old and new date) | Sync never removes a paid lesson that disappeared from the calendar | Paid/planned data moves to the student's next lesson, then the stale lesson is removed | Manual + data check |
+| 2 | 2026-11-04 | Medium | Lesson actions | A prepaid lesson had no button to mark it held | Settle button was hidden for paid lessons | Added "✓ mark held" for prepaid lessons; auto-close prepaid lessons after they end | Manual |
+| 3 | 2026-11-08 | Critical | Payments | "Pay at next lesson" showed only the old debt, not the lesson being paid for | Expected-payment rows included only deferred lessons | Include every lesson up to the payment date | Manual |
+| 4 | 2026-11-08 | Critical | Payments | Recording a payment from the debts panel left lessons marked unpaid | Payment save did not link covered lessons | New payments mark covered lessons paid, oldest first | QA TC18 |
+| 5 | 2026-11-09 | High | Notes | Notes typed in the institution tab were lost | Saving one field re-rendered the screen and wiped the field being typed | No re-render while typing + autosave 0.9 s after typing stops | Manual |
+| 6 | 2026-11-09 | High | Calendar sync | To-do events ("edit video", "marketing") became fake students/lessons | To-do filter missed these verbs | Extended the to-do keyword filter | Data check |
+| 7 | 2026-11-09 | High | Calendar sync | A lesson titled "X (via Y)" was assigned to the referrer Y | Student matching read the referrer's name | Ignore names after "via / referred by"; re-match existing lessons on sync | Manual |
+| 8 | 2026-11-10 | Critical | Debts | A lesson covered by credit showed as "not paid" after it ended | Overdue check ignored a zero amount due | Lessons with nothing due are never overdue; auto-close them | Manual |
+| 9 | 2026-11-12 | Medium | Lesson list | Marking a lesson held removed it from the list before payment could be recorded | Held lessons left "upcoming" immediately | Added explicit "held, not paid" flow; unpaid held lessons go to Debts | QA TC16–17 |
+| 10 | 2026-11-12 | Critical | Debts | A student showed a false debt after a prepaid lesson | The same lesson existed twice and was charged twice | Duplicates (same calendar event) are charged once and cleaned up on load | QA TC20 |
+| 11 | 2026-11-17 | Medium | Lesson actions | Package/credit lessons asked "held and paid" | Button logic only knew the explicit paid flag | Lessons fully covered by credit show only "mark held" | QA TC19 |
+| 12 | 2026-11-18 | Critical | Income | Weekly expected income counted an institution day that did not happen | Pay counted for every scheduled day | Count only reported days; monthly check that the payment arrived by the 10th | Manual |
+| 13 | 2026-11-18 | **Critical** | Lesson actions | "Mark held" / "held, not paid" created a duplicate lesson instead of updating it | Handler passed the lesson object's id, which the store does not include (undefined → new document) | Use the id from the button | QA TC16 (found by automated QA) |
+| 14 | 2026-11-18 | Medium | Payments | Paying for a lesson marked "held, not paid" before it ended did not mark it paid | Covered-lessons search ignored held lessons that had not ended | Include held, unpaid lessons up to the payment date | QA TC18 |
+| 15 | 2026-11-18 | Medium | Demo | Hidden hints showed in the lesson form (e.g. "this date is during a vacation") | Demo build dropped the base CSS reset for `[hidden]` | Restored the reset in the demo page | QA TC38 |
+| 16 | 2026-11-18 | Low | Home | Lessons in the list were hard to tell apart | Thin separator line only | Each lesson is a separate card with spacing and an accent edge | QA TC39 |
+| 17 | 2026-11-18 | Low | Home | Help button showed only "?"; the receipt link did not look like a button | Icon-only control; ghost link style | Labeled the help button; receipt link styled as a button | QA TC40 |
+
+## Test suite
+Automated end-to-end checks (Playwright, run on both the demo and the production build): page load, all tabs, debts and credit math, weekly income, week navigation, held/unpaid flow, payments, package lessons, duplicate protection, add/validate student, student card, background scroll lock, message template, WhatsApp link, plan box order, persistence, reset, layout at 360 px and 1280 px, dark mode, RTL, render time.

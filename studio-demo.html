@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}*{-webkit-tap-highlight-color:transparent}</style>
 </head>
 <body>
 
 <title>יומן הסטודיו · דמו</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&family=Frank+Ruhl+Libre:wght@300;400;500&family=Bellefair&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&family=Rubik:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@300;400;500&family=Bellefair&display=swap">
 <style>
 /* Layout: calm single-hue operating console; cards on a soft ground, bottom tab bar on phones, top rail on desktop */
 :root{
@@ -440,27 +441,32 @@ button.alert.bad .ckgo{color:inherit}
 .pc-row .r{white-space:nowrap}
 .pc-row.tot{border-top:1px solid var(--line);margin-top:4px;padding-top:4px;font-weight:600}
 .pc-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-</style><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap">
-<style>
-/* demo typography */
+
+/* upcoming lessons: each lesson is its own card, clearly separated */
+.upnext .list{display:flex;flex-direction:column;gap:12px}
+.upnext .item{margin:0;width:100%;padding:14px 14px 12px;border:1px solid var(--line);border-inline-start:4px solid var(--accent);border-radius:14px;background:var(--surface);box-shadow:0 1px 2px rgb(22 34 45 / .05),0 6px 18px rgb(22 34 45 / .06);transition:box-shadow .15s,transform .15s}
+.upnext .item:last-child{border-bottom:1px solid var(--line)}
+.upnext .item:hover{background:var(--surface);box-shadow:0 2px 4px rgb(22 34 45 / .08),0 10px 24px rgb(22 34 45 / .10)}
+.upnext .item .t{font-size:1.05rem}
+.upnext .item .planbox{background:var(--sunk);border-radius:10px}
+.upnext .item.od{border-inline-start-color:var(--red)}
+/* typography */
 :root{--display:"Rubik","Heebo",system-ui,sans-serif;--body:"Rubik","Heebo",system-ui,sans-serif}
 html{font-size:15px}
-body{font-size:15px;line-height:1.55;letter-spacing:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+*{-webkit-tap-highlight-color:transparent}
 header.top h1{font-family:var(--display);font-weight:700;font-size:1.75rem;letter-spacing:-.01em}
 h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spacing:-.005em}
 .panel h2{font-size:1.08rem}
 .kpi .l,.split .l,.fl{font-weight:500;letter-spacing:0}
 .kpi .v,.split .v,.fv,.wsum .wn,.pc-amt,.ttime,.rhname{font-family:var(--display)!important;font-weight:600!important;letter-spacing:-.01em}
 .item .t,.tname{font-weight:600}
-.item .s,.tmeta,.muted,.tiny{color:var(--muted)}
 .btn{font-weight:500}
 .ev b{font-family:var(--body)!important;font-weight:600!important}
 .tg .hd .dn{font-family:var(--display)!important;font-weight:600!important}
-/* the institution tab is specific to the real business: hidden in the demo */
-nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}
-
-</style>
-
+.tip>button.tipq{width:auto!important;height:auto!important;border-radius:9px!important;padding:6px 10px!important;font-size:.8rem!important;border:1px dashed var(--line)!important}
+.quick .btn{min-height:38px}
+</style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
   <div class="blessing" aria-label="בשם השם נעשה ונצליח"><span class="orn" aria-hidden="true"></span><span class="bt-text">בְּשֵׁם הַשֵּׁם נַעֲשֶׂה וְנַצְלִיחַ</span><span class="orn" aria-hidden="true"></span></div>
@@ -954,11 +960,11 @@ function viewHome(){
   </div>
   <div class="quick"><span class="tiny muted">פעולות מהירות:</span>
     <button class="btn small" data-act="newPayment">רישום תשלום</button>
-    <span style="display:flex;gap:4px;align-items:center"><button class="btn small" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" aria-label="מה כדאי להעלות">?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span></span>
+    <span style="display:flex;gap:4px;align-items:center"><button class="btn small" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" class="tipq" aria-label="מה כדאי להעלות">מה להעלות?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span></span>
     <button class="btn small" data-act="newExpense">רישום הוצאה</button>
     <button class="btn small" data-act="newStudent">תלמיד חדש</button>
     <button class="btn small" data-act="newVacation">חופשה</button>
-    <a class="btn small ghost" href="${YPAY_URL}" target="_blank" rel="noopener">הפקת קבלה בוויי־פיי</a>
+    <a class="btn small" href="${YPAY_URL}" target="_blank" rel="noopener">🧾 הפקת קבלה בוויי־פיי</a>
   </div>
 `;
 }
@@ -1354,7 +1360,7 @@ function viewMoney(){
     <div class="list">${list.length?list.map(p=>`<div class="item" role="button" tabindex="0" data-act="editPayment" data-id="${p.id}"><div class="main"><div class="t">${sl(p.studentId,esc(payerOf(p)))}</div><div class="s">${fmtD(p.date)} · ${esc(payMethodText(p))}${p.kind==="כרטיסייה"?` · כרטיסייה ${p.lessonsCount||""}`:""}${p.kind==="החזר"?" · החזר":""}${p.estimated?" · משוער":""}</div></div><div class="end"><div class="${p.amount<0?"neg":"money"} num">${ils(p.amount)}</div>${p.kind==="החזר"?`<span class="chip">החזר</span>`:p.receiptNo?rcptLink(p):(S.authorities.settings?.hideRcpt?"":`<span class="chip warn">בלי קבלה</span>`)}</div></div>`).join(""):`<div class="empty">${payFilter==="norcpt"?"לכל התשלומים יש קבלה.":"אין תשלומים בחודש הזה."}</div>`}</div>
   </div>
   <div class="panel">
-    <div class="spread"><h2>הוצאות</h2><div class="row"><button class="btn small primary" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" aria-label="מה כדאי להעלות">?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span><button class="btn small" data-act="newExpense">בלי קובץ</button></div></div>
+    <div class="spread"><h2>הוצאות</h2><div class="row"><button class="btn small primary" data-act="uploadExpense">העלאת קובץ הוצאה</button><span class="tip"><button type="button" class="tipq" aria-label="מה כדאי להעלות">מה להעלות?</button><span class="bubble" role="tooltip"><b>מה כדאי להעלות</b><ul><li><b>2026</b>: כל החודשים מינואר ועד היום. זו השנה שהעסק פעל בה.</li><li><b>2025</b>: רק אם עבדת כעצמאי כבר אז, כי הדוח השנתי שלה עוד פתוח עד 30/11/2026.</li><li><b>שנים קודמות</b>: רק אם תגיש בקשה להחזר מס, עד 6 שנים אחורה.</li><li><b>הוצאות בית</b>: כל חשבון חשמל, ארנונה, מים, אינטרנט ושכירות, גם אם רק חלק מוכר.</li><li><b>הוצאות עסק</b>: עמלות פלטפורמות, ציוד, תווים, השתלמויות, נסיעות, טלפון.</li></ul>עדיף קבלה או חשבונית רשמית. אם אין, צילום מסך מהאתר או מהבנק שמראה תאריך, סכום ולמי שולם.</span></span><button class="btn small" data-act="newExpense">בלי קובץ</button></div></div>
     <div class="list">${elist.length?elist.map(e=>`<button class="item" data-act="editExpense" data-id="${e.id}"><div class="main"><div class="t">${esc(e.vendor||e.category||"הוצאה")}</div><div class="s">${fmtD(e.date)} · ${esc(e.category||"")}${e.fileId?" · יש קובץ מצורף":" · בלי קובץ"}</div></div><div class="end num"><b>${ils(recog(e))}</b>${pctOf(e)!==100?`<div class="tiny muted">${pctOf(e)==null?"חסר אחוז":pctOf(e)+"% מתוך "+ils(e.amount)}</div>`:""}</div></button>`).join(""):`<div class="empty">אין הוצאות בחודש הזה. צלם קבלה ורשום אותה עם "הוצאה חדשה".</div>`}</div>
   </div>
   <div class="row"><button class="btn" data-act="export">ייצוא שנת ${finYear} לקובץ לרואה חשבון</button></div>`;
