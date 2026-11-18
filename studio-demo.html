@@ -477,7 +477,7 @@ button.alert.bad .ckgo{color:inherit}
    all names, phones and payments are invented for demonstration. */
 (function () {
   if (window.claude && window.claude.use) return; // running inside Claude: use the real runtime
-  const KEY = "studio-ledger-demo-v2";
+  const KEY = "studio-ledger-demo-v3";
   const pad = n => String(n).padStart(2, "0");
   const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
@@ -491,7 +491,7 @@ button.alert.bad .ckgo{color:inherit}
       { id: "s-maya", name: "מאיה כהן", price: 200, day: 0, time: "16:00", source: "לימוד נעים", phone: "0500000001" },
       { id: "s-yoni", name: "יוני לוי", price: 180, day: 1, time: "17:00", source: "סופר־פרוף", phone: "0500000002" },
       { id: "s-noga", name: "נוגה אברהם", price: 180, day: 2, time: "18:30", source: "איזי", phone: "0500000003" },
-      { id: "s-ido", name: "עידו מזרחי", price: 160, day: 3, time: "17:00", source: "פה לאוזן", phone: "0500000004", plannedLessons: 5 },
+      { id: "s-ido", name: "עידו מזרחי", price: 160, day: 3, time: "17:00", source: "פה לאוזן", phone: "0500000004", plannedLessons: 8 },
       { id: "s-tamar", name: "תמר פרץ", price: 200, day: 4, time: "16:00", source: "לימוד נעים", phone: "0500000005" },
       { id: "s-omer", name: "עומר דהן", price: 180, day: 4, time: "18:00", source: "סופר־פרוף", phone: "0500000006" }
     ];
@@ -511,7 +511,7 @@ button.alert.bad .ckgo{color:inherit}
         const id = "l-" + s.id + "-" + date;
         const lesson = { studentId: s.id, date, time: s.time, duration: 60, price: s.price, mode: "פרונטלי",
           status: past ? "done" : "planned", topic: "", homework: "", plan: plans[(n++) % plans.length], nextPlan: "" };
-        if (s.plannedLessons && w > 0) return; // package covers 5 lessons
+        if (s.plannedLessons && w > 3) return; // package covers 8 lessons
         db.lessons[id] = lesson;
         if (past) {
           const unpaid = s.id === "s-omer" && w === -1; // one open debt for the demo
@@ -525,8 +525,8 @@ button.alert.bad .ckgo{color:inherit}
       });
     }
     // prepaid package of 5 lessons for עידו
-    db.payments["p-ido-pack"] = { studentId: "s-ido", payer: "", amount: 800, date: from, kind: "כרטיסייה", lessonsCount: 5,
-      method: "העברה", transferType: "ביט", receiptNo: "", note: "חבילה של 5 שיעורים" };
+    db.payments["p-ido-pack"] = { studentId: "s-ido", payer: "", amount: 1280, date: from, kind: "כרטיסייה", lessonsCount: 8,
+      method: "העברה", transferType: "ביט", receiptNo: "", note: "חבילה של 8 שיעורים" };
     db.expenses["e-1"] = { date: iso(addDays(today, -10)), amount: 250, category: "פרסום בפלטפורמות", note: "מנוי חודשי לפלטפורמת תלמידים", pct: 100 };
     db.reminders["r-1"] = { title: "להגיש דוח שנתי למס הכנסה", due: iso(addDays(today, 20)), authority: "מס הכנסה", done: false };
     db.authorities.settings = { gcalOff: true, hideRcpt: true };
@@ -884,7 +884,7 @@ function viewHome(){
   const yearIn=arr(S.payments).filter(p=>p.date?.startsWith(y)).reduce((a,p)=>a+(+p.amount||0),0);
   const monthEx=arr(S.expenses).filter(e=>e.date?.startsWith(ym)).reduce((a,e)=>a+recog(e),0);
   const monthLessons=arr(S.lessons).filter(l=>l.date?.startsWith(ym)&&l.status==="done").length;
-  const upAllList=arr(S.lessons).filter(l=>l.date>=t&&(l.status==="planned"||(l.date===t&&l.status!=="cancelled"&&!lessonEnded(l))))  /* שיעור שסומן "התקיים" עובר ל"חובות" אם לא שולם */.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const upAllList=arr(S.lessons).filter(l=>l.date>=t&&(l.status==="planned"||(l.date===t&&l.status!=="cancelled"&&!lessonEnded(l)&&!(l.status==="done"&&!l.paid))))  /* שיעור שסומן "התקיים, לא שולם" יוצא מהרשימה ועובר ל"חובות" */.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   const upcoming=upAllList.slice(0,6), upRest=upAllList.slice(6);
   const wkLabel=d=>{const w0=weekStart(0),dd=parseD(d);const n=Math.floor((dd-w0)/(7*864e5));return n<=0?"השבוע":n===1?"שבוע הבא":n===2?"בעוד שבועיים":`בעוד ${n} שבועות`};
   const restHtml=()=>{let out="",last="";upRest.forEach(l=>{const w=wkLabel(l.date);if(w!==last){out+=`<div class="sh" style="margin-top:12px">${w} · ${fmtD(iso(weekStart(0+Math.floor((parseD(l.date)-weekStart(0))/(7*864e5)))))}</div>`;last=w}out+=lessonItem(l,true)});return out};
@@ -1914,7 +1914,7 @@ function lessonSheet(id,preset={}){
 async function coverLessons(sid,pid,amount,date,owe){
   /* owe = החוב לפי שיעור, כפי שחושב לפני שהתשלום החדש נשמר */
   let left=amount;
-  const cand=arr(S.lessons).filter(l=>l.studentId===sid&&!l.paid&&l.status!=="cancelled"&&(owe[l.id]!=null||(l.status==="planned"&&l.date<=date)))
+  const cand=arr(S.lessons).filter(l=>l.studentId===sid&&!l.paid&&l.status!=="cancelled"&&(owe[l.id]!=null||(l.status==="planned"&&l.date<=date)||((l.status==="done"||l.status==="late")&&l.date<=date)))
     .sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
   for(const l of cand){const c=owe[l.id]!=null?owe[l.id]:(+l.price||0);if(left+0.5<c)break;left-=c;
     const d={...strip(l),paid:true,paidBy:pid,payLater:""};if(l.status==="planned"&&lessonEnded(l))d.status="done";
@@ -2423,8 +2423,8 @@ document.addEventListener("click",async e=>{
     case "history":historySheet(id);break;
     case "noMethod":dUnspec();break;
     case "rhHistory":rhHistorySheet(id);break;
-    case "doneUnpaid":{const l=S.lessons[a.dataset.id];if(l){await save("lessons",l.id,{...strip(l),status:"done",paid:false});render();toast(`סומן שהתקיים. נכנס לחובות: ${ils(+l.price||0)}`)}break}
-    case "markDone":{const l=S.lessons[a.dataset.id];if(l){await save("lessons",l.id,{...strip(l),status:"done",paid:true});render();toast("סומן שהתקיים")}break}
+    case "doneUnpaid":{const lid0=a.dataset.id,l=S.lessons[lid0];if(l){await save("lessons",lid0,{...strip(l),status:"done",paid:false});render();toast(`סומן שהתקיים. נכנס לחובות: ${ils(+l.price||0)}`)}break}
+    case "markDone":{const lid0=a.dataset.id,l=S.lessons[lid0];if(l){await save("lessons",lid0,{...strip(l),status:"done",paid:true});render();toast("סומן שהתקיים")}break}
     case "cpaRemDone":{const r=G.cpaRem[+a.dataset.i];if(r){const cur=S.authorities.settings||{};await save("authorities","settings",{...cur,cpaRemDone:[...(cur.cpaRemDone||[]),r.id].slice(-500)});G.cpaRem.splice(+a.dataset.i,1);render();toast("סומן כבוצע")}break}
     case "payDebt":paymentSheet(null,{studentId:id,...(a.dataset.amt?{amount:+a.dataset.amt}:{})});break;
     case "payRemRecord":{const r=G.payRem[+a.dataset.i];if(r)paymentSheet(null,{studentId:r.sid});break}
