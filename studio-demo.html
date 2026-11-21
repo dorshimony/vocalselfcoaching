@@ -403,11 +403,11 @@ details.inc{border-bottom:1px solid var(--line2)!important;padding:12px 0!import
   .panel{padding:12px!important}
   h1{font-size:1.6rem!important}
 }
-.ev.reg{background:#E3F4EA!important;border-inline-start:3px solid #2E8B57!important}
+.ev.reg{background:var(--reg-bg)!important;border-inline-start:3px solid var(--reg-line)!important}
 .lg{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--surface);border:1px solid var(--line);border-inline-start:3px solid var(--accent);vertical-align:middle}
 .lg.reg{background:#E3F4EA;border-inline-start-color:#2E8B57}.lg.od{background:var(--red-soft);border-inline-start-color:var(--red)}
-@media (prefers-color-scheme:dark){.ev.reg,.lg.reg{background:#183527!important}}
-.ev.reg.cancelled{background:#E3F4EA!important;opacity:.75}
+
+.ev.reg.cancelled{background:var(--reg-bg)!important;opacity:.75}
 .ev.reg.cancelled b{text-decoration:line-through}
 .ev.cancelled::after{content:"בוטל";display:block;font-size:.6rem;font-weight:700;color:var(--red)}
 button.alert{width:100%;text-align:right;font:inherit;color:inherit;cursor:pointer;border-inline-start:3px solid var(--line);transition:filter .12s}
@@ -506,6 +506,18 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 :root[data-skin="mint"]{--bg:#F2FAF7;--surface:#FFFFFF;--sunk:#E5F4EE;--ink:#0D2A22;--ink2:#2E4F45;--muted:#6C8A80;--line:#D7EDE4;--line2:#E6F4EE;--accent:#0F9F74;--accent-ink:#FFFFFF;--accent-soft:#DDF4EA;--accent-strong:#0B5E46;--ok:#0B5E46;--ok-soft:#DDF4EA;--warn:#0B5E46;--warn-soft:#DDF4EA;--bad:#FFFFFF;--bad-soft:#0B5E46;--neg:#0B5E46;color-scheme:light}
 :root[data-skin="mono"]{--bg:#F5F5F7;--surface:#FFFFFF;--sunk:#EFEFF2;--ink:#1D1D1F;--ink2:#3A3A3C;--muted:#86868B;--line:#E2E2E6;--line2:#EDEDF0;--accent:#1D1D1F;--accent-ink:#FFFFFF;--accent-soft:#EDEDF0;--accent-strong:#000000;--ok:#1D1D1F;--ok-soft:#EDEDF0;--warn:#1D1D1F;--warn-soft:#EDEDF0;--bad:#FFFFFF;--bad-soft:#1D1D1F;--neg:#1D1D1F;color-scheme:light}
 :root[data-skin="night"]{--bg:#0B0D12;--surface:#14161C;--sunk:#1B1E26;--ink:#ECEEF4;--ink2:#C2C6D2;--muted:#8A90A0;--line:#252935;--line2:#1E222C;--accent:#8B93FF;--accent-ink:#0B0D12;--accent-soft:#1F2340;--accent-strong:#B6BBFF;--ok:#8B93FF;--ok-soft:#1A1E35;--warn:#B6BBFF;--warn-soft:#1F2340;--bad:#0B0D12;--bad-soft:#B6BBFF;--neg:#B6BBFF;--red:#FF8A80;--red-soft:#3A1F22;--shadow:0 1px 2px rgb(0 0 0 / .4);--shadow-lg:0 12px 40px rgb(0 0 0 / .6);color-scheme:dark}
+
+/* regular-student colour follows the theme */
+:root{--reg-bg:#E3F4EA;--reg-line:#2E8B57}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--reg-bg:#183527;--reg-line:#4CC38A}}
+:root[data-theme="dark"]{--reg-bg:#183527;--reg-line:#4CC38A}
+:root[data-skin="indigo"]{--reg-bg:#E7F6EE;--reg-line:#1F9D63}
+:root[data-skin="vivid"]{--reg-bg:#FFF1D6;--reg-line:#E08A00}
+:root[data-skin="warm"]{--reg-bg:#EEF2E2;--reg-line:#5F7A3A}
+:root[data-skin="mint"]{--reg-bg:#FFF4D9;--reg-line:#C98A0B}
+:root[data-skin="mono"]{--reg-bg:#E9E9ED;--reg-line:#6E6E73}
+:root[data-skin="night"]{--reg-bg:#1C2B24;--reg-line:#4CC38A}
+.lg.reg{background:var(--reg-bg)!important;border-inline-start-color:var(--reg-line)!important}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -544,7 +556,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
    all names, phones and payments are invented for demonstration. */
 (function () {
   if (window.claude && window.claude.use) return; // running inside Claude: use the real runtime
-  const KEY = "studio-ledger-demo-v3";
+  const KEY = "studio-ledger-demo-v4";
   const pad = n => String(n).padStart(2, "0");
   const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
@@ -577,7 +589,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
         const past = d < today;
         const id = "l-" + s.id + "-" + date;
         const lesson = { studentId: s.id, date, time: s.time, duration: 60, price: s.price, mode: "פרונטלי",
-          status: past ? "done" : "planned", topic: "", homework: "", plan: plans[(n++) % plans.length], nextPlan: "" };
+          status: past ? "done" : "planned", topic: "", homework: "", plan: plans[(n++) % plans.length], nextPlan: "", ...(i % 2 === 0 ? { gcalTitle: s.name + " · שיעור קבוע" } : {}) };
         if (s.plannedLessons && w > 3) return; // package covers 8 lessons
         db.lessons[id] = lesson;
         if (past) {
@@ -1304,7 +1316,7 @@ function weekGrid(off){
     <div class="hrs">${hrs}</div>
     ${days.map(d=>{const vac=vacationOn(d);
       const busy=G.busy.filter(b=>b.date===d).map(b=>{const y=top(b.from),h=Math.max(18,top(b.to||b.from)-y);return `<div class="ev busy" tabindex="0" style="top:${y}px;height:${h}px" data-tip="${esc(b.from+"–"+(b.to||"")+" · "+b.title)}"><span class="bt">${esc(b.title)}</span></div>`}).join("");
-      const les=arr(S.lessons).filter(l=>l.date===d).map(l=>{const y=top(l.time),h=Math.max(20,(+l.duration||60)/60*HH-2);return `<button class="ev ${l.status}${overdueUnpaid(l)?" od":""}${isRegular(l.studentId,l)?" reg":""}" style="top:${y}px;height:${h}px" data-act="editLesson" data-id="${l.id}" data-tip="${esc((studentName(l.studentId)||"")+" · "+(l.time||"")+" · "+(l.duration||60)+" דק׳"+(l.status==="planned"&&(l.paid||DUE[l.id]?.due===0)?" · "+prepaidTxt(l):l.status==="planned"&&DUE[l.id]?" · לתשלום: "+ils(DUE[l.id].due)+(DUE[l.id].note?" ("+DUE[l.id].note+")":""):l.status==="done"?" · התקיים, "+ils(l.price):"")+(l.gcalTitle?" — "+l.gcalTitle:"")+(S.students[l.studentId]?.traits?"\n"+S.students[l.studentId].traits:"")+(remindOf(l)?"\n\n🔔 "+remindOf(l):"")+(l.status==="planned"?"\n\nנעבוד על: "+(planOf(l)||"עוד לא נרשם"):(planOf(l)||l.topic)?"\n\nעבדנו על: "+(planOf(l)||l.topic):""))}"><b>${remindOf(l)?"🔔 ":""}${esc(studentName(l.studentId)||"?")}</b><span class="num">${esc(l.time||"")}</span>${l.mode==="זום"?" · זום":""}${l.payLater&&!l.paid?`<span class="paynote">${payWaiting(l)?"ישלם כשייקבע":(payLate(l)?"היה אמור לשלם ":"ישלם ")+fmtD(payLaterDate(l)).slice(0,5)}</span>`:l.status==="planned"&&(l.paid||DUE[l.id]?.due===0)?`<span class="paynote">${prepaidTxt(l)}</span>`:l.status==="planned"&&DUE[l.id]&&DUE[l.id].due!==(+l.price||0)?`<span class="paynote">משלם ${ils(DUE[l.id].due)}</span>`:""}</button>`}).join("");
+      const les=arr(S.lessons).filter(l=>l.date===d&&!(l.status==="cancelled"&&S.students[l.studentId]?.active===false)).map(l=>{const y=top(l.time),h=Math.max(20,(+l.duration||60)/60*HH-2);return `<button class="ev ${l.status}${overdueUnpaid(l)?" od":""}${isRegular(l.studentId,l)?" reg":""}" style="top:${y}px;height:${h}px" data-act="editLesson" data-id="${l.id}" data-tip="${esc((studentName(l.studentId)||"")+" · "+(l.time||"")+" · "+(l.duration||60)+" דק׳"+(l.status==="planned"&&(l.paid||DUE[l.id]?.due===0)?" · "+prepaidTxt(l):l.status==="planned"&&DUE[l.id]?" · לתשלום: "+ils(DUE[l.id].due)+(DUE[l.id].note?" ("+DUE[l.id].note+")":""):l.status==="done"?" · התקיים, "+ils(l.price):"")+(l.gcalTitle?" — "+l.gcalTitle:"")+(S.students[l.studentId]?.traits?"\n"+S.students[l.studentId].traits:"")+(remindOf(l)?"\n\n🔔 "+remindOf(l):"")+(l.status==="planned"?"\n\nנעבוד על: "+(planOf(l)||"עוד לא נרשם"):(planOf(l)||l.topic)?"\n\nעבדנו על: "+(planOf(l)||l.topic):""))}"><b>${remindOf(l)?"🔔 ":""}${esc(studentName(l.studentId)||"?")}</b><span class="num">${esc(l.time||"")}</span>${l.mode==="זום"?" · זום":""}${l.payLater&&!l.paid?`<span class="paynote">${payWaiting(l)?"ישלם כשייקבע":(payLate(l)?"היה אמור לשלם ":"ישלם ")+fmtD(payLaterDate(l)).slice(0,5)}</span>`:l.status==="planned"&&(l.paid||DUE[l.id]?.due===0)?`<span class="paynote">${prepaidTxt(l)}</span>`:l.status==="planned"&&DUE[l.id]&&DUE[l.id].due!==(+l.price||0)?`<span class="paynote">משלם ${ils(DUE[l.id].due)}</span>`:""}</button>`}).join("");
       const inRange=d===t&&now.getHours()>=H0&&now.getHours()<H1;
       return `<div class="col ${vac?"vac":""} ${d===t?"today":""}" style="height:${(H1-H0)*HH}px" ${vac?`title="${esc(vac.title)}"`:""}>${inRange?`<div class="slotnow" style="top:${(now.getHours()-H0)*HH}px;height:${HH}px"></div><div class="nowline" style="top:${nowTop}px"><span class="nowdot"></span><span class="nowlbl num">${pad(now.getHours())}:${pad(now.getMinutes())}</span></div>`:""}${busy}${les}</div>`}).join("")}
   </div></div>`;

@@ -24,6 +24,8 @@ Severity: **Critical** = wrong money data · **High** = wrong lesson/student dat
 | 17 | 2026-11-18 | Low | Home | Help button showed only "?"; the receipt link did not look like a button | Icon-only control; ghost link style | Labeled the help button; receipt link styled as a button | QA TC40 |
 | 18 | 2026-11-18 | Low | UI (touch) | Tapping a lesson card left it tinted light blue | Hover styles stick on touch screens after a tap | Hover colours disabled on touch devices; no focus outline on tap | QA TC42 |
 | 19 | 2026-11-18 | Medium | UX | Windows (student card, new lesson, etc.) had no clear way back | Only the backdrop or Esc closed a window | Sticky "✕ סגירה" button at the top of every window | QA TC41 |
+| 20 | 2026-11-21 | Medium | Themes | Regular-student lessons were dark green with dark text (unreadable) in some themes | Hard-coded green colours, and the phone's dark-mode rule ignored the chosen theme | Regular-student colours follow the theme (one pair per theme) | QA TC47 |
+| 21 | 2026-11-21 | Low | Calendar | Cancelled lessons of a student who left still showed in the week grid | Grid showed every cancelled lesson | Hide cancelled lessons of inactive students | Manual |
 
 ## Test suite
 Automated end-to-end checks (Playwright, run on both the demo and the production build): page load, all tabs, debts and credit math, weekly income, week navigation, held/unpaid flow, payments, package lessons, duplicate protection, add/validate student, student card, background scroll lock, message template, WhatsApp link, plan box order, persistence, reset, layout at 360 px and 1280 px, dark mode, RTL, render time.
