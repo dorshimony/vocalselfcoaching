@@ -518,6 +518,15 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 :root[data-skin="mono"]{--reg-bg:#E9E9ED;--reg-line:#6E6E73}
 :root[data-skin="night"]{--reg-bg:#1C2B24;--reg-line:#4CC38A}
 .lg.reg{background:var(--reg-bg)!important;border-inline-start-color:var(--reg-line)!important}
+
+/* techniques */
+.techtopics{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.techtopics .chip{border:1px solid var(--line);cursor:pointer;font-size:.82rem;padding:4px 12px}
+.techlist{display:flex;flex-direction:column;gap:10px}
+.techcard{border:1px solid var(--line);border-inline-start:4px solid var(--accent);border-radius:14px;padding:12px 14px;background:var(--surface);box-shadow:var(--shadow)}
+.techtitle{font-size:1.02rem}
+.techdesc{margin-top:6px;color:var(--ink2);font-size:.92rem}
+.techacts{margin-top:8px}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -537,6 +546,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
     <button role="tab" data-tab="calendar" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>יומן</button>
     <button role="tab" data-tab="money" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="6" width="19" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.8"/><path d="M6 9.5v.01M18 15.5v.01"/></svg>כספים</button>
     <button role="tab" data-tab="rh" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M12 4v3"/></svg>ר. השרון</button>
+    <button role="tab" data-tab="tech" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>טכניקות</button>
     <button role="tab" data-tab="cpa" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 12l2 2 4-4M10 18h6"/></svg>רו״ח</button>
     <button role="tab" data-tab="gov" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6z"/></svg>רשויות</button>
   </nav>
@@ -556,7 +566,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
    all names, phones and payments are invented for demonstration. */
 (function () {
   if (window.claude && window.claude.use) return; // running inside Claude: use the real runtime
-  const KEY = "studio-ledger-demo-v4";
+  const KEY = "studio-ledger-demo-v5";
   const pad = n => String(n).padStart(2, "0");
   const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
@@ -565,7 +575,7 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
   function seed() {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const sunday = addDays(today, -today.getDay());
-    const db = { students: {}, lessons: {}, payments: {}, expenses: {}, reminders: {}, authorities: {}, vacations: {}, rhStudents: {}, rhLessons: {} };
+    const db = { students: {}, lessons: {}, payments: {}, expenses: {}, reminders: {}, authorities: {}, vacations: {}, rhStudents: {}, rhLessons: {}, techniques: {} };
     const students = [
       { id: "s-maya", name: "מאיה כהן", price: 200, day: 0, time: "16:00", source: "לימוד נעים", phone: "0500000001" },
       { id: "s-yoni", name: "יוני לוי", price: 180, day: 1, time: "17:00", source: "סופר־פרוף", phone: "0500000002" },
@@ -603,7 +613,17 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
         }
       });
     }
-    // prepaid package of 5 lessons for עידו
+    const T = [
+      ["beg", "פיתוח קול", "בוף שפתיים", "לנשוף אוויר דרך שפתיים רפויות ולהשמיע צליל.\nלעלות ולרדת בגלישה, בלי לדחוף.\n2–3 דקות בתחילת כל אימון."],
+      ["beg", "פיתוח קול", "נשימה סרעפתית", "יד על הבטן, שאיפה באף 4 שניות, נשיפה על ססס 8 שניות.\nהכתפיים לא עולות."],
+      ["beg", "ריפים", "ריף של 3 תווים", "דו־רה־מי־רה־דו לאט על \"אה\".\nלהגביר מהירות רק כשהתווים נקיים."],
+      ["mid", "פיתוח קול", "טוואנג", "צליל צר ובהיר כמו \"ניי ניי\".\nלשמור על גרון פתוח, בלי לחץ בלסת."],
+      ["mid", "ריפים", "סולם פנטטוני", "פנטטוני מינורי עולה ויורד, 5 תווים.\nעם מטרונום, להתחיל ב־70."],
+      ["adv", "פיתוח קול", "מיקס בטווח העליון", "סירנה על \"נג\" ואז פתיחה ל\"אה\" באותו מקום.\nלשמור על אותו צבע במעבר."],
+      ["adv", "ריפים", "ריף ארוך עם קפיצה", "רצף של 8 תווים עם קפיצת קוורטה באמצע.\nקודם לאט על \"אה\", אחר כך על מילים."]
+    ];
+    T.forEach(([level, topic, title, desc], k) => { db.techniques["t-" + k] = { level, topic, title, desc, order: k, createdAt: from }; });
+    // prepaid package of 8 lessons for עידו
     db.payments["p-ido-pack"] = { studentId: "s-ido", payer: "", amount: 1280, date: from, kind: "כרטיסייה", lessonsCount: 8,
       method: "העברה", transferType: "ביט", receiptNo: "", note: "חבילה של 8 שיעורים" };
     db.expenses["e-1"] = { date: iso(addDays(today, -10)), amount: 250, category: "פרסום בפלטפורמות", note: "מנוי חודשי לפלטפורמת תלמידים", pct: 100 };
@@ -659,7 +679,7 @@ const LESSON_STATUS={planned:["מתוכנן","acc"],done:["התקיים","ok"],c
 const MONTHS=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
 const DAYS=["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
 
-const S={students:{},lessons:{},payments:{},expenses:{},reminders:{},authorities:{},vacations:{},rhStudents:{},rhLessons:{},ready:false,canWrite:true};
+const S={students:{},lessons:{},payments:{},expenses:{},reminders:{},authorities:{},vacations:{},rhStudents:{},rhLessons:{},techniques:{},ready:false,canWrite:true};
 const DEF_LESSON_TPL="היי {שם}, מה שלומך? 😊\nרק רציתי להזכיר שיש לנו שיעור פיתוח קול {יום} ב־{שעה}{מקום} 🎵\nנתראה! דור";
 const DEF_VAC_TPL="היי {שם}, מה שלומך? 😊\nרק רציתי לעדכן שאני בחופשה מ־{מתאריך} עד {עדתאריך}, ולכן לא יתקיימו שיעורים בימים האלה. נחזור כרגיל אחרי.";
 let db=null, assets=null, downloads=null;
@@ -789,7 +809,7 @@ async function start(){
     downloads=await claude.use("downloads");
   }catch(e){}
   if(!db){$("#syncState").textContent="תצוגה בלבד, אין חיבור לנתונים";S.ready=true;render();return}
-  const cols=["students","lessons","payments","expenses","reminders","authorities","vacations","rhStudents","rhLessons"];
+  const cols=["students","lessons","payments","expenses","reminders","authorities","vacations","rhStudents","rhLessons","techniques"];
   let loaded=0;
   cols.forEach(c=>{
     db.collection(c).onSnapshot(snap=>{
@@ -848,7 +868,7 @@ function render(){
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===tab)));
   const v=$("#view");
   const scroll=window.scrollY;
-  v.innerHTML=`<section class="view">${({home:viewHome,students:viewStudents,calendar:viewCalendar,money:viewMoney,rh:viewRH,cpa:viewCpa,gov:viewGov})[tab]()}</section>`;
+  v.innerHTML=`<section class="view">${({home:viewHome,students:viewStudents,calendar:viewCalendar,money:viewMoney,rh:viewRH,tech:viewTech,cpa:viewCpa,gov:viewGov})[tab]()}</section>`;
   if(render._keep){window.scrollTo(0,scroll)}
   if(S.ready)navBadges();
   stickGridHeads();
@@ -1846,6 +1866,35 @@ const dlg=$("#dlg"), sheet=$("#sheet");
 let _lockY=0;
 function lockBg(){if(document.body.classList.contains("sheetlock"))return;_lockY=window.scrollY;document.body.style.top=(-_lockY)+"px";document.body.classList.add("sheetlock")}
 function unlockBg(){if(!document.body.classList.contains("sheetlock"))return;document.body.classList.remove("sheetlock");document.body.style.top="";window.scrollTo(0,_lockY)}
+
+/* ---------- טכניקות: מאגר תרגילים לפי שלב ---------- */
+const TECH_LEVELS=[["beg","קל"],["mid","בינוני"],["adv","קשה"]];
+const TECH_TOPICS=["פיתוח קול","ריפים"];
+let techLevel="beg", techTopic="";
+function techTopics(){const t=new Set(TECH_TOPICS);arr(S.techniques).forEach(x=>x.topic&&t.add(x.topic));return [...t]}
+function viewTech(){
+  const all=arr(S.techniques);
+  const L=all.filter(x=>(x.level||"beg")===techLevel&&(!techTopic||x.topic===techTopic)).sort((a,b)=>(+a.order||0)-(+b.order||0)||(a.title||"").localeCompare(b.title||""));
+  const cnt=lv=>all.filter(x=>(x.level||"beg")===lv).length;
+  return `<div class="panel"><div class="spread"><h2>טכניקות ותרגילים</h2><button class="btn primary small" data-act="techNew">+ תרגיל חדש</button></div>
+    <p class="tiny muted" style="margin:4px 0 12px">מאגר התרגילים שלך, מסודר לפי רמת קושי.</p>
+    <div class="seg" role="group" aria-label="רמה">${TECH_LEVELS.map(([k,n])=>`<button type="button" data-act="techLevel" data-lv="${k}" aria-pressed="${k===techLevel}">${n} <span class="tiny">${cnt(k)}</span></button>`).join("")}</div>
+    <div class="techtopics">${["",...techTopics()].map(t=>`<button type="button" class="chip ${t===techTopic?"acc":""}" data-act="techTopic" data-t="${esc(t)}">${t?esc(t):"הכול"}</button>`).join("")}</div>
+    <div class="techlist">${L.length?L.map(x=>`<article class="techcard"><div class="spread"><b class="techtitle">${esc(x.title||"")}</b>${x.topic?`<span class="chip">${esc(x.topic)}</span>`:""}</div>${x.desc?`<div class="pre techdesc">${esc(x.desc)}</div>`:""}<div class="row techacts"><button class="btn small" data-act="techEdit" data-id="${x.id}">עריכה</button><button class="btn small ghost" data-act="techCopy" data-id="${x.id}">העתקה</button></div></article>`).join(""):`<div class="empty">אין עדיין תרגילים ברמה הזו${techTopic?` בנושא ${esc(techTopic)}`:""}. לחץ "+ תרגיל חדש" כדי להוסיף.</div>`}</div></div>`;
+}
+function techSheet(id){const x=id?S.techniques[id]:null;
+  openSheet(`<h2>${x?"עריכת תרגיל":"תרגיל חדש"}</h2><form id="f" class="sec" style="gap:12px">
+    <label class="f">שם התרגיל<input type="text" id="x_title" maxlength="80" value="${esc(x?.title||"")}" placeholder="למשל: בוף עם קש"></label>
+    <div class="grid2"><label class="f">רמה<select id="x_level">${TECH_LEVELS.map(([k,n])=>`<option value="${k}" ${(x?.level||techLevel)===k?"selected":""}>${n}</option>`).join("")}</select></label>
+    <label class="f">נושא<input type="text" id="x_topic" list="x_topics" value="${esc(x?.topic||techTopic||"פיתוח קול")}"><datalist id="x_topics">${techTopics().map(t=>`<option value="${esc(t)}">`).join("")}</datalist></label></div>
+    <label class="f">איך עושים / מה חשוב לשים לב<textarea id="x_desc" rows="6" placeholder="שלבים, דגשים, כמה זמן...">${esc(x?.desc||"")}</textarea></label>
+    <label class="f">סדר בתוך הרמה (מספר קטן = למעלה)<input type="number" id="x_order" value="${esc(x?.order??"")}"></label>
+    <div class="row"><button class="btn primary" type="submit">שמירה</button>${x?'<button class="btn danger" type="button" id="x_del">מחיקה</button>':""}</div></form>`,
+  r=>{r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const title=r.querySelector("#x_title").value.trim();if(!title){toast("צריך שם לתרגיל");return}
+      const d={...(x||{}),title,level:r.querySelector("#x_level").value,topic:r.querySelector("#x_topic").value.trim(),desc:r.querySelector("#x_desc").value.trim(),order:r.querySelector("#x_order").value===""?null:+r.querySelector("#x_order").value,updatedAt:iso(new Date())};
+      if(!x)d.createdAt=iso(new Date());delete d.id;
+      if(await save("techniques",id||null,d)!==null){techLevel=d.level;closeSheet();render();toast("נשמר")}};
+    const del=r.querySelector("#x_del");if(del)del.onclick=async()=>{if(!confirm("למחוק את התרגיל?"))return;await remove("techniques",id);closeSheet();render();toast("נמחק")}})}
 /* ---------- עיצובים ---------- */
 const SKINS=[
   {id:"",name:"קלאסי",desc:"כחול רגוע, כמו שהיה",sw:["#F3F6F9","#3D6C93","#24496A"]},
@@ -2017,7 +2066,7 @@ async function coverLessons(sid,pid,amount,date,owe){
   /* owe = החוב לפי שיעור, כפי שחושב לפני שהתשלום החדש נשמר */
   let left=amount;
   const cand=arr(S.lessons).filter(l=>l.studentId===sid&&!l.paid&&l.status!=="cancelled"&&(owe[l.id]!=null||(l.status==="planned"&&l.date<=date)||((l.status==="done"||l.status==="late")&&l.date<=date)))
-    .sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
+    .sort((a,b)=>{const h=l=>(l.status==="done"||l.status==="late"||lessonEnded(l))?0:1;return h(a)-h(b)||(a.date+(a.time||"")).localeCompare(b.date+(b.time||""))});
   for(const l of cand){const c=owe[l.id]!=null?owe[l.id]:(+l.price||0);if(left+0.5<c)break;left-=c;
     const d={...strip(l),paid:true,paidBy:pid,payLater:""};if(l.status==="planned"&&lessonEnded(l))d.status="done";
     await save("lessons",l.id,d)}
@@ -2526,6 +2575,11 @@ document.addEventListener("click",async e=>{
     case "noMethod":dUnspec();break;
     case "rhHistory":rhHistorySheet(id);break;
     case "skins":skinsSheet();break;
+    case "techNew":techSheet(null);break;
+    case "techEdit":techSheet(a.dataset.id);break;
+    case "techLevel":techLevel=a.dataset.lv;render();break;
+    case "techTopic":techTopic=a.dataset.t;render();break;
+    case "techCopy":{const x=S.techniques[a.dataset.id];if(x){const t=x.title+(x.desc?"\n"+x.desc:"");try{await navigator.clipboard.writeText(t);toast("הועתק")}catch(_){toast("לא הצלחתי להעתיק")}}break}
     case "editTitle":titleSheet();break;
     case "doneUnpaid":{const lid0=a.dataset.id,l=S.lessons[lid0];if(l){await save("lessons",lid0,{...strip(l),status:"done",paid:false});render();toast(`סומן שהתקיים. נכנס לחובות: ${ils(+l.price||0)}`)}break}
     case "markDone":{const lid0=a.dataset.id,l=S.lessons[lid0];if(l){await save("lessons",lid0,{...strip(l),status:"done",paid:true});render();toast("סומן שהתקיים")}break}
