@@ -527,6 +527,12 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 .techtitle{font-size:1.02rem}
 .techdesc{margin-top:6px;color:var(--ink2);font-size:.92rem}
 .techacts{margin-top:8px}
+
+/* close bar: solid strip, content never scrolls under it */
+.sheetbar{background:var(--surface);margin:-6px -18px 0;padding:8px 18px 10px;border-bottom:1px solid var(--line);top:-10px;align-items:center;gap:10px;flex:0 0 auto}
+@media (min-width:760px){.sheetbar{margin:-22px -24px 0;padding:14px 24px 12px;top:-22px}}
+.sheeterr{flex:1;color:var(--red,#C62828);font-weight:600;font-size:.9rem;line-height:1.35}
+.sheet .bad,.sheet .bad:focus{border-color:var(--red,#C62828)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--red,#C62828) 22%,transparent)!important}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -696,7 +702,7 @@ const fmtD=s=>{if(!s)return"";const d=parseD(s);return pad(d.getDate())+"/"+pad(
 const ils=n=>{const v=Math.round(Number(n)||0);return (v<0?"-":"")+"₪"+Math.abs(v).toLocaleString("he-IL")};
 const arr=o=>Object.entries(o).map(([id,v])=>({id,...v}));
 const daysBetween=(a,b)=>Math.round((parseD(b)-parseD(a))/864e5);
-function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2400)}
+function toast(msg){const t=$("#toast");try{const host=dlg.open?dlg:document.body;if(t.parentNode!==host)host.appendChild(t)}catch(_){}t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2400)}
 
 /* ---------- domain ---------- */
 function studentName(id){return S.students[id]?.name||""}
@@ -1890,7 +1896,7 @@ function techSheet(id){const x=id?S.techniques[id]:null;
     <label class="f">איך עושים / מה חשוב לשים לב<textarea id="x_desc" rows="6" placeholder="שלבים, דגשים, כמה זמן...">${esc(x?.desc||"")}</textarea></label>
     <label class="f">סדר בתוך הרמה (מספר קטן = למעלה)<input type="number" id="x_order" value="${esc(x?.order??"")}"></label>
     <div class="row"><button class="btn primary" type="submit">שמירה</button>${x?'<button class="btn danger" type="button" id="x_del">מחיקה</button>':""}</div></form>`,
-  r=>{r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const title=r.querySelector("#x_title").value.trim();if(!title){toast("צריך שם לתרגיל");return}
+  r=>{r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const title=r.querySelector("#x_title").value.trim();if(!title){need(r,"x_title","חסר שם לתרגיל");return}
       const d={...(x||{}),title,level:r.querySelector("#x_level").value,topic:r.querySelector("#x_topic").value.trim(),desc:r.querySelector("#x_desc").value.trim(),order:r.querySelector("#x_order").value===""?null:+r.querySelector("#x_order").value,updatedAt:iso(new Date())};
       if(!x)d.createdAt=iso(new Date());delete d.id;
       if(await save("techniques",id||null,d)!==null){techLevel=d.level;closeSheet();render();toast("נשמר")}};
@@ -1914,11 +1920,17 @@ function skinsSheet(){const cur=skinGet();
   r=>r.querySelectorAll("[data-skin]").forEach(b=>b.onclick=()=>{const id=b.dataset.skin;try{localStorage.setItem("skin",id)}catch(_){}skinApply(id);skinsSheet()}))}
 function titleSheet(){const at=document.getElementById("appTitle");const def=at?.dataset.def||"יומן הסטודיו";const cur=S.authorities.settings?.appTitle||def;
   openSheet(`<h2>שם האפליקציה</h2><form id="f" class="sec" style="gap:12px"><label class="f">השם שיופיע בראש המסך<input type="text" id="t_name" maxlength="40" value="${esc(cur)}"></label><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" id="t_reset">חזרה לשם המקורי</button></div></form>`,
-  r=>{r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const v=r.querySelector("#t_name").value.trim();if(!v){toast("צריך שם");return}
+  r=>{r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const v=r.querySelector("#t_name").value.trim();if(!v){need(r,"t_name","חסרה כותרת");return}
       if(await save("authorities","settings",{...(S.authorities.settings||{}),appTitle:v})!==null){S.authorities.settings={...(S.authorities.settings||{}),appTitle:v};closeSheet();render();toast("השם עודכן")}};
     r.querySelector("#t_reset").onclick=async()=>{const st={...(S.authorities.settings||{})};delete st.appTitle;if(await save("authorities","settings",st)!==null){S.authorities.settings=st;closeSheet();render();toast("חזר לשם המקורי")}}})}
 function openSheet(html,bind){sheet.innerHTML=`<div class="sheetbar"><button type="button" class="sheetclose" data-sheetclose aria-label="סגירה וחזרה">✕ סגירה</button></div>`+html;sheet.querySelector("[data-sheetclose]").onclick=()=>closeSheet();sheet.scrollTop=0;if(!dlg.open)dlg.showModal();lockBg();bind&&bind(sheet);const f=sheet.querySelector("input,select,textarea");if(f&&window.innerWidth>760)f.focus()}
 function closeSheet(){dlg.close();unlockBg()}
+/* הודעת "מה חסר" בפס העליון של החלון + סימון השדה */
+function sheetErr(msg){const b=sheet.querySelector(".sheetbar");if(!b){toast(msg);return}let m=b.querySelector(".sheeterr");if(!m){m=document.createElement("div");m.className="sheeterr";m.setAttribute("role","alert");b.prepend(m)}m.textContent="⚠ אי אפשר לשמור: "+msg}
+function need(r,id,msg){sheetErr(msg);const f=r.querySelector("#"+id);if(!f)return;f.classList.add("bad");try{f.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}f.focus({preventScroll:true});
+  const clr=()=>{f.classList.remove("bad");if(!sheet.querySelector(".bad"))sheet.querySelector(".sheeterr")?.remove()};f.addEventListener("input",clr,{once:true});f.addEventListener("change",clr,{once:true})}
+dlg.addEventListener("invalid",e=>{e.preventDefault();if(sheet.querySelector(".bad"))return;const f=e.target;const lab=(f.closest("label")?.firstChild?.textContent||"").trim();
+  need(sheet,f.id||"__none",lab?("חסר "+lab):"יש שדה חובה ריק");if(!f.id){f.classList.add("bad");f.focus()}},true);
 dlg.addEventListener("close",unlockBg);
 dlg.addEventListener("click",e=>{if(e.target===dlg)closeSheet()});
 function opts(list,sel){return list.map(o=>`<option ${o===sel?"selected":""}>${esc(o)}</option>`).join("")}
@@ -1959,7 +1971,7 @@ function studentSheet(id){
   </form>`,r=>{
     let kind=s.kind||"פרטי";
     r.querySelectorAll("#kindSeg button").forEach(b=>b.onclick=()=>{kind=b.dataset.k;r.querySelectorAll("#kindSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));r.querySelector("#membersWrap").hidden=kind!=="קבוצה"});
-    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const name=val(r,"s_name");if(!name){toast("צריך שם");return}
+    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const name=val(r,"s_name");if(!name){need(r,"s_name","חסר שם התלמיד");return}
       const data={...s,name,kind,members:val(r,"s_members"),phone:val(r,"s_phone"),email:val(r,"s_email"),source:val(r,"s_source"),mode:val(r,"s_mode"),price:+val(r,"s_price")||0,duration:+val(r,"s_dur")||60,notes:val(r,"s_notes"),traits:val(r,"s_traits"),nextPrice:val(r,"s_nextPrice")===""?null:+val(r,"s_nextPrice"),nextNote:val(r,"s_nextNote"),plannedLessons:val(r,"s_plan")===""?null:+val(r,"s_plan"),active:r.querySelector("#s_active").checked};
       if(!id){data.createdAt=today();data.trackFrom=today()}
       data.autoAdded=false;
@@ -2044,7 +2056,7 @@ function lessonSheet(id,preset={}){
       await savePrev(r,"l");
       if(id)Object.keys(l).forEach(k=>{if(k!=="id"&&!(k in data))data[k]=l[k]});
       {const bx=r.querySelector("#l_imgs");if(bx)data.planImgs=stripIds(bx)}
-      if(!data.date){toast("צריך תאריך");return}
+      if(!data.date){need(r,"l_date","חסר תאריך לשיעור");return}
       if(id){data.reminderSent=!!l.reminderSent;if(l.gcalId)data.gcalId=l.gcalId;if(l.gcalTitle)data.gcalTitle=l.gcalTitle}
       const sv=S.students[data.studentId];
       const ph=val(r,"l_phone").trim();if(sv&&ph!==(sv.phone||""))await save("students",data.studentId,{...strip(sv),phone:ph});
@@ -2096,7 +2108,7 @@ function paymentSheet(id,preset={}){
     r.querySelectorAll("#methSeg button").forEach(b=>b.onclick=()=>{method=b.dataset.m;r.querySelectorAll("#methSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));r.querySelector("#ttWrap").hidden=method!=="העברה"});
     r.querySelector("#p_student").onchange=e=>{r.querySelector("#payerWrap").hidden=!!e.target.value;const s=S.students[e.target.value];if(s&&!id)r.querySelector("#p_amount").value=kind==="כרטיסייה"?(s.price||0)*(+val(r,"p_cnt")||5):(s.price||0)};
     r.querySelector("#f").onsubmit=async e=>{e.preventDefault();
-      let amount=Math.abs(+val(r,"p_amount")); if(!amount){toast("צריך סכום");return}
+      let amount=Math.abs(+val(r,"p_amount")); if(!amount){need(r,"p_amount","חסר סכום התשלום");return}
       if(kind==="החזר")amount=-amount;
       const data={...p,studentId:val(r,"p_student")||null,payer:val(r,"p_payer"),amount,date:val(r,"p_date"),kind,lessonsCount:kind==="כרטיסייה"?(+val(r,"p_cnt")||5):null,method,transferType:method==="העברה"?val(r,"p_tt"):"",receiptNo:val(r,"p_rcpt"),note:val(r,"p_note")};
       delete data.id;
@@ -2123,7 +2135,7 @@ function expenseSheet(id,preFile){
     <div class="spread"><div class="row"><button class="btn primary" type="submit" id="x_save">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div>
   </form>`,r=>{
     r.querySelector("#f").onsubmit=async e=>{e.preventDefault();
-      const amount=+val(r,"x_amount"); if(!amount){toast("צריך סכום");return}
+      const amount=+val(r,"x_amount"); if(!amount){need(r,"x_amount","חסר סכום ההוצאה");return}
       const data={...x,amount,date:val(r,"x_date"),vendor:val(r,"x_vendor"),category:val(r,"x_cat"),method:val(r,"x_method"),note:val(r,"x_note"),pct:val(r,"x_pct")===""?null:+val(r,"x_pct")};
       delete data.id;
       const file=r.querySelector("#x_file")?.files?.[0]||preFile;
@@ -2144,7 +2156,7 @@ function reminderSheet(id){
     <label class="row"><input type="checkbox" id="m_done" ${m.done?"checked":""}> בוצע</label>
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div>
   </form>`,r=>{
-    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const title=val(r,"m_title");if(!title){toast("צריך לכתוב מה לעשות");return}
+    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const title=val(r,"m_title");if(!title){need(r,"m_title","חסר מה לעשות");return}
       const data={title,due:val(r,"m_due"),authority:val(r,"m_auth"),note:val(r,"m_note"),done:r.querySelector("#m_done").checked};
       if(await save("reminders",id,data)!==null){closeSheet();toast("נשמר")}};
     armDelete(r,()=>remove("reminders",id));
@@ -2161,7 +2173,7 @@ function vacationSheet(id){
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div>
   </form>`,r=>{
     r.querySelector("#f").onsubmit=async e=>{e.preventDefault();
-      const from=val(r,"v_from"),to=val(r,"v_to")||from; if(!from){toast("צריך תאריך");return} if(to<from){toast("תאריך הסיום לפני ההתחלה");return}
+      const from=val(r,"v_from"),to=val(r,"v_to")||from; if(!from){need(r,"v_from","חסר תאריך התחלה");return} if(to<from){toast("תאריך הסיום לפני ההתחלה");return}
       const data={title:val(r,"v_title")||"חופשה",from,to,notified:!!v.notified};
       const nid=await save("vacations",id,data); if(nid!==null){toast("החופשה נשמרה");vacNotifySheet(nid,data)}};
     armDelete(r,()=>remove("vacations",id));
@@ -2467,7 +2479,7 @@ function rhStudentSheet(id){
     <label class="f">רקע על התלמיד<textarea id="r_notes">${esc(st.notes||"")}</textarea></label>
     <label class="row"><input type="checkbox" id="r_active" ${st.active!==false?"checked":""}> פעיל</label>
     <div class="spread"><div class="row"><button class="btn primary" type="submit">שמירה</button><button class="btn ghost" type="button" data-close>ביטול</button></div>${id?delButton():""}</div></form>`,r=>{
-    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const name=val(r,"r_name");if(!name){toast("צריך שם");return}
+    r.querySelector("#f").onsubmit=async e=>{e.preventDefault();const name=val(r,"r_name");if(!name){need(r,"r_name","חסר שם התלמיד");return}
       if(await save("rhStudents",id,{...(id?strip({id,...st}):{}),name,instrument:val(r,"r_inst"),slot:val(r,"r_slot"),notes:val(r,"r_notes"),focus:val(r,"r_focus"),song:val(r,"r_song"),active:r.querySelector("#r_active").checked})!==null){closeSheet();toast("נשמר")}};
     armDelete(r,()=>remove("rhStudents",id));
   });
