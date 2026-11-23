@@ -533,6 +533,8 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 @media (min-width:760px){.sheetbar{margin:-22px -24px 0;padding:14px 24px 12px;top:-22px}}
 .sheeterr{flex:1;color:var(--red,#C62828);font-weight:600;font-size:.9rem;line-height:1.35}
 .sheet .bad,.sheet .bad:focus{border-color:var(--red,#C62828)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--red,#C62828) 22%,transparent)!important}
+
+.rhbreak{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--warn-soft);color:var(--ink);font-size:.95rem}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -2429,6 +2431,11 @@ function rhMondays(){const c=rhCfg();const out=[];const d=parseD(c.start);const 
 function rhPlanOf(sid,date){const l=S.rhLessons[rhLessonId(date,sid)];if(l?.plan)return l.plan;
   const prev=arr(S.rhLessons).filter(x=>x.sid===sid&&x.date<date&&x.attended!==false).sort((a,b)=>b.date.localeCompare(a.date))[0];
   if(prev)return prev.nextPlan||"";return S.rhStudents[sid]?.focus||""}
+/* הפסקה בין שיעורים ברמת השרון: פער של 10 דקות ומעלה בין סוף שיעור לתחילת הבא */
+function rhBreak(prev,cur){if(!prev||!prev.slot||!cur.slot)return "";const m=t=>{const [h,mi]=t.split(":").map(Number);return h*60+mi};
+  let end=prev.slotEnd?m(prev.slotEnd):m(prev.slot)+45;if(end%5===4)end+=1;const st=m(cur.slot);if(st-end<10)return "";
+  const f=x=>String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0");
+  return `<div class="rhbreak" role="note"><span>☕ הפסקה</span><b class="num">${f(end)}–${f(st)}</b><span class="tiny">${st-end} דק׳</span></div>`}
 function viewRH(){
   const cfg=rhCfg(),t=today();
   if(!rhDate){if(t<cfg.start)rhDate=cfg.start;else{const x=parseD(t);x.setDate(x.getDate()-((x.getDay()+6)%7));rhDate=iso(x)}}
@@ -2453,7 +2460,7 @@ function viewRH(){
     <div class="spread"><div class="row"><button class="btn small" data-act="rhPrev" aria-label="שני קודם">→</button><b>יום שני ${fmtD(rhDate)}</b><button class="btn small" data-act="rhNext" aria-label="שני הבא">←</button></div><div class="row"><button class="btn small" data-act="rhReport">טקסט מעקב להעתקה</button><button class="btn small primary" data-act="rhAdd">תלמיד חדש</button></div></div>
     ${rhDate<cfg.start?`<div class="empty">התחלת העבודה ב־${fmtD(cfg.start)}</div>`:""}
     <div class="list" style="gap:12px;margin-top:10px">${sts.length?sts.map((st,ix)=>{const l=S.rhLessons[rhLessonId(rhDate,st.id)]||{};const att=l.attended!==false;
-      return `<div class="rhcard ${att?"":"absent"}" data-sid="${st.id}">
+      return `${rhBreak(sts[ix-1],st)}<div class="rhcard ${att?"":"absent"}" data-sid="${st.id}">
         <div class="spread"><div><span class="rhnum num">${ix+1}</span><b class="rhname">${esc(st.name)}</b> <span class="tiny muted">${esc(st.instrument||"")}${st.slot?" · <span class=\"num\">"+esc(st.slot)+(st.slotEnd?"–"+esc(st.slotEnd):"")+"</span>":""}${st.place?" · "+esc(st.place):""}</span></div>
         <div class="row"><div class="seg" style="padding:3px"><button data-rh="att" data-v="1" aria-pressed="${att}">הגיע</button><button data-rh="att" data-v="0" aria-pressed="${!att}">לא הגיע</button></div><button class="btn small ghost" data-act="rhEditStudent" data-id="${st.id}">עריכה</button></div></div>
         <input type="text" class="rhtrait" data-sid="${st.id}" value="${esc(st.traits||"")}" placeholder="תכונות בסיסיות: לוחץ מדי, משוחרר מדי…">
