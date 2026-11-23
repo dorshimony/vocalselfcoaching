@@ -540,6 +540,9 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 textarea{field-sizing:content;min-height:64px;max-height:45vh;overflow-y:auto}
 .rhcard textarea{min-height:56px}
 @media (hover:none){textarea{resize:none}}
+
+a.tlink{color:var(--accent);text-decoration:underline;text-underline-offset:2px;word-break:break-all;unicode-bidi:isolate}
+.tlinks{font-size:.85rem;margin-top:-4px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -1163,21 +1166,24 @@ function planBox(l){
   const pv=prevLesson(l), pl=planOf(l), w=pv?(planOf(pv)||pv.topic):"";
   const last=`<div class="pl"><span class="plk">שיעור שעבר${pv?" · "+fmtD(pv.date):""}</span>${pv?(w?esc(w):`<span class="muted">לא נרשם</span>`):`<span class="muted">זה השיעור הראשון שרשום</span>`}</div>`;
   const pg=planProgress(l), dn=new Set(l.planDone||[]);
-  const plHtml=pl?planItems(pl).map(x=>!x.head&&dn.has(x.key)?`<span class="pdone">✓ ${esc(x.raw)}</span>`:esc(x.raw)).join("\n"):"";
-  const pim=(l.planImgs||[]).length?`<div class="pimgs">${imgThumbs(l.planImgs,false)}</div>`:"";
+  const plHtml=pl?planItems(pl).map(x=>!x.head&&dn.has(x.key)?`<span class="pdone">✓ ${linkify(esc(x.raw))}</span>`:linkify(esc(x.raw))).join("\n"):"";
+  const allImgs=[...new Set([...(pv?.nextImgs||[]),...(l.planImgs||[])])];
+  const pim=allImgs.length?`<div class="pimgs">${imgThumbs(allImgs,false)}</div>`:"";
   const next=pl||pim?`<div class="pl"><span class="plk">נעבוד על</span><span class="pre">${plHtml}</span>${pim} <button class="lnk" data-act="planLesson" data-id="${l.id}">עריכה</button> ${pg?`<button class="btn small" data-act="checkPlan" data-id="${l.id}">✓ מה עשינו${pg.done?` · ${pg.done}/${pg.all}`:""}</button>`:""}</div>`:`<div class="pl"><button class="btn small" data-act="planLesson" data-id="${l.id}">+ על מה נעבוד בשיעור הזה</button></div>`;
   const payl=l.paid?`<div class="pl pdone">💳 ${l.status==="planned"?prepaidTxt(l):"שולם"+(paidOn(l)?" ב־"+fmtD(paidOn(l)).slice(0,5):"")}</div>`:"";
   const nPast=arr(S.lessons).filter(x=>x.studentId===l.studentId&&(x.status==="done"||x.status==="late")).length;
   /* קודם "נעבוד על" (השיעור הזה), ומה שעשינו בשיעור שעבר מקופל מתחת */
-  const lastBox=pv&&w?`<details class="pl lastd"><summary class="lnk">מה עשינו בשיעור שעבר · ${fmtD(pv.date).slice(0,5)}</summary><span class="pre">${esc(w)}</span>${nPast>1?` <button class="lnk" data-act="history" data-id="${l.studentId}">📖 שיעורים קודמים</button>`:""}</details>`:"";
+  const lastBox=pv&&(w||(pv.planImgs||[]).length)?`<details class="pl lastd"><summary class="lnk">מה עשינו בשיעור שעבר · ${fmtD(pv.date).slice(0,5)}</summary><span class="pre">${linkify(esc(w))}</span>${(pv.planImgs||[]).length?`<div class="pimgs">${imgThumbs(pv.planImgs,false)}</div>`:""}${nPast>1?` <button class="lnk" data-act="history" data-id="${l.studentId}">📖 שיעורים קודמים</button>`:""}</details>`:"";
   return `${remindOf(l)?`<div class="remindchip">🔔 ${esc(remindOf(l))}</div>`:""}<div class="planbox">${next}${lastBox}${payl}</div>`;
 }
 /* תמונות ב"על מה נעבוד": הדבקה (Ctrl+V / הדבק) או כפתור. נשמרות כקבצים של האפליקציה, והמזהים בשיעור (planImgs) */
 function imgThumbs(ids,edit){return (ids||[]).map(id=>`<span class="pimg"><button type="button" class="pimgopen" data-imgopen="${esc(id)}" aria-label="פתיחת התמונה"><img src="/_blob/${esc(id)}" alt="תמונה" loading="lazy"></button>${edit?`<button type="button" class="pimgx" data-imgdel="${esc(id)}" aria-label="הסרת תמונה">×</button>`:""}</span>`).join("")}
-function imgStrip(l,px){
-  const ids=l.planImgs||[];
-  return `<div class="pimgs" id="${px}_imgs" data-ids='${esc(JSON.stringify(ids))}' data-lid="${esc(l.id||"")}">${imgThumbs(ids,true)}</div>
-    ${assets?`<label class="btn small" style="align-self:flex-start;cursor:pointer">📷 הוספת תמונה<input type="file" accept="image/*" multiple hidden data-imgadd="${px}"></label><span class="tiny muted">אפשר גם להדביק תמונה ישר בתיבת הטקסט</span>`:""}`}
+function imgStrip(l,px,field,boxId){
+  field=field||"planImgs";boxId=boxId||px+"_imgs";const ids=l[field]||[];
+  return `<div class="pimgs" id="${boxId}" data-field="${field}" data-ids='${esc(JSON.stringify(ids))}' data-lid="${esc(l.id||"")}">${imgThumbs(ids,true)}</div>
+    ${assets?`<div class="row" style="gap:8px;align-items:center"><label class="btn small" style="cursor:pointer">📷 הוספת תמונה<input type="file" accept="image/*" multiple hidden data-imgadd="${boxId}"></label><span class="tiny muted">אפשר גם להדביק תמונה ישר בתיבת הטקסט</span></div>`:""}`}
+/* מזהה תיבת התמונות של שדה טקסט: _plan → <px>_imgs, _next/_prev → <id>_imgs */
+function imgBoxFor(tid){return /_plan$/.test(tid)?tid.replace(/_plan$/,"_imgs"):/_(next|prev)$/.test(tid)?tid+"_imgs":null}
 /* צפייה בתמונה בגודל מלא, מעל כל חלון פתוח */
 function openImg(id,all){
   let d=document.getElementById("imgdlg");
@@ -1190,36 +1196,39 @@ function openImg(id,all){
 document.addEventListener("click",e=>{const b=e.target.closest("[data-imgopen]");if(!b)return;e.preventDefault();e.stopPropagation();
   const box=b.closest(".pimgs");const all=[...box.querySelectorAll("[data-imgopen]")].map(x=>x.dataset.imgopen);openImg(b.dataset.imgopen,all)},true);
 function stripIds(box){try{return JSON.parse(box.dataset.ids||"[]")}catch(_){return []}}
-async function addPlanImages(px,files){
-  const box=document.getElementById(px+"_imgs");if(!box)return;
+async function addPlanImages(boxId,files){
+  const box=document.getElementById(boxId)||document.getElementById(boxId+"_imgs");if(!box)return;
   if(!assets){toast("הוספת תמונות זמינה רק לבעל האפליקציה");return}
   const imgs=[...files].filter(f=>f&&/^image\//.test(f.type));if(!imgs.length)return;
   toast(imgs.length>1?`מעלה ${imgs.length} תמונות…`:"מעלה תמונה…");
   const ids=stripIds(box);
   for(const f of imgs){try{const up=await assets.upload(f,f.type?undefined:{type:"image/png"});ids.push(up.id)}catch(e){toast(e?.code==="too_large"?"התמונה גדולה מדי (עד 20MB)":"העלאת התמונה נכשלה");}}
   box.dataset.ids=JSON.stringify(ids);box.innerHTML=imgThumbs(ids,true);
-  const lid=box.dataset.lid;if(lid&&lid!=="_new"&&S.lessons[lid])await save("lessons",lid,{...strip(S.lessons[lid]),planImgs:ids});
+  const lid=box.dataset.lid,fld=box.dataset.field||"planImgs";if(lid&&lid!=="_new"&&S.lessons[lid])await save("lessons",lid,{...strip(S.lessons[lid]),[fld]:ids});
   toast("התמונה נשמרה");
 }
-document.addEventListener("paste",e=>{const t=e.target;if(!(t&&t.tagName==="TEXTAREA"&&/_plan$/.test(t.id||"")))return;
+document.addEventListener("paste",e=>{const t=e.target;const bx=t&&t.tagName==="TEXTAREA"?imgBoxFor(t.id||""):null;if(!bx||!document.getElementById(bx))return;
   const fs=[...(e.clipboardData?.items||[])].filter(i=>i.kind==="file"&&/^image\//.test(i.type)).map(i=>i.getAsFile()).filter(Boolean);
-  if(!fs.length)return;e.preventDefault();addPlanImages(t.id.replace(/_plan$/,""),fs)});
+  if(!fs.length)return;e.preventDefault();addPlanImages(bx,fs)});
 document.addEventListener("change",e=>{const px=e.target.dataset?.imgadd;if(!px)return;const fs=e.target.files;addPlanImages(px,fs);e.target.value=""});
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-imgdel]");if(!b)return;e.preventDefault();e.stopPropagation();
   const box=b.closest(".pimgs");const ids=stripIds(box).filter(x=>x!==b.dataset.imgdel);box.dataset.ids=JSON.stringify(ids);box.innerHTML=imgThumbs(ids,true);
-  const lid=box.dataset.lid;if(lid&&lid!=="_new"&&S.lessons[lid])await save("lessons",lid,{...strip(S.lessons[lid]),planImgs:ids});toast("התמונה הוסרה")},true);
+  const lid=box.dataset.lid,fld=box.dataset.field||"planImgs";if(lid&&lid!=="_new"&&S.lessons[lid])await save("lessons",lid,{...strip(S.lessons[lid]),[fld]:ids});toast("התמונה הוסרה")},true);
 document.addEventListener("click",e=>{if(e.target.closest(".lastd summary"))e.stopPropagation()},true);
 function planFields(l,px){
   const nm=studentName(l.studentId)||"התלמיד", pv=prevLesson(l), past=l.status!=="planned"||l.date<today();
   const pw=pv?(planOf(pv)||pv.topic||""):"";
   return `${pv?`<div class="sechd">שיעור שעבר · ${fmtD(pv.date)}</div>
-    <label class="f">מה עשינו בשיעור שעבר<textarea id="${px}_prev" data-pid="${pv.id}" placeholder="אם שכחת לרשום, אפשר להשלים כאן">${esc(pw)}</textarea></label>`:""}
+    <label class="f">מה עשינו בשיעור שעבר<textarea id="${px}_prev" data-pid="${pv.id}" placeholder="אם שכחת לרשום, אפשר להשלים כאן">${esc(pw)}</textarea></label>
+    ${imgStrip({...pv},px,"planImgs",px+"_prev_imgs")}`:""}
     <div class="sechd">${past?"השיעור הזה · על מה עבדנו":"לפני השיעור · על מה נעבוד"}</div>
     ${l.id&&l.id!=="_new"&&planProgress(l)?`<button type="button" class="btn small" data-act="checkPlan" data-id="${l.id}" style="align-self:flex-start">✓ סימון מה עשינו${planProgress(l).done?` · ${planProgress(l).done}/${planProgress(l).all}`:""}</button>`:""}
     <label class="f">${past?"על מה עבדנו בשיעור הזה":"על מה נעבוד בשיעור הזה"}<textarea id="${px}_plan" placeholder="${past?"נשימה, תמיכה, מעברי רגיסטר, שיר…":"להמשיך מאיפה שעצרנו, שיר חדש, תרגילי נשימה…"}">${esc(planOf(l)||(past?l.topic||"":""))}</textarea></label>
+    ${(pv?.nextImgs||[]).length?`<div class="tiny muted">תמונות שנקבעו בשיעור שעבר לשיעור הזה:</div><div class="pimgs">${imgThumbs(pv.nextImgs,false)}</div>`:""}
     ${imgStrip(l,px)}
     <div class="sechd">לשיעור הבא · על מה נעבוד</div>
-    <label class="f">מה להמשיך בשיעור הבא<textarea id="${px}_next" placeholder="מה שתרשום כאן יופיע אוטומטית בשיעור הבא של ${esc(nm)}">${esc(l.nextPlan||"")}</textarea></label>`;
+    <label class="f">מה להמשיך בשיעור הבא<textarea id="${px}_next" placeholder="מה שתרשום כאן יופיע אוטומטית בשיעור הבא של ${esc(nm)}">${esc(l.nextPlan||"")}</textarea></label>
+    ${imgStrip(l,px,"nextImgs",px+"_next_imgs")}`;
 }
 async function savePrev(r,px){
   const t=r.querySelector("#"+px+"_prev");if(!t)return;const pid=t.dataset.pid,pv=S.lessons[pid];if(!pid||!pv)return;
@@ -1276,7 +1285,7 @@ function historySheet(sid){
   const rest=ls.slice(1);
   openSheet(`<h2>${sl(sid,esc(s.name))} · היסטוריית שיעורים</h2>
   <div class="tiny muted">${firstLessonDate(sid)?`השיעור הראשון: ${fmtD(firstLessonDate(sid))} · `:""}${ls.length} שיעורים התקיימו. השיעור האחרון${ls[0]?" ("+fmtD(ls[0].date)+")":""} מופיע בכרטיס, כאן כל מה שלפניו.</div>
-  <div class="list" style="gap:8px">${rest.length?rest.map(l=>{const w=planOf(l)||l.topic;return `<div class="prevbox"><b class="tiny">${fmtD(l.date)} · יום ${DAYS[parseD(l.date).getDay()]}</b>${w?`<div class="pre">${esc(w)}</div>`:`<div class="tiny muted">לא נרשם על מה עבדנו</div>`}${l.nextPlan?`<div class="tiny muted" style="margin-top:4px"><b>נקבע לשיעור הבא:</b></div><div class="pre tiny">${esc(l.nextPlan)}</div>`:""}</div>`}).join(""):`<div class="empty">אין שיעורים קודמים לפני האחרון</div>`}</div>
+  <div class="list" style="gap:8px">${rest.length?rest.map(l=>{const w=planOf(l)||l.topic;return `<div class="prevbox"><b class="tiny">${fmtD(l.date)} · יום ${DAYS[parseD(l.date).getDay()]}</b>${w?`<div class="pre">${linkify(esc(w))}</div>`:`<div class="tiny muted">לא נרשם על מה עבדנו</div>`}${(l.planImgs||[]).length?`<div class="pimgs">${imgThumbs(l.planImgs,false)}</div>`:""}${l.nextPlan||(l.nextImgs||[]).length?`<div class="tiny muted" style="margin-top:4px"><b>נקבע לשיעור הבא:</b></div><div class="pre tiny">${linkify(esc(l.nextPlan||""))}</div>${(l.nextImgs||[]).length?`<div class="pimgs">${imgThumbs(l.nextImgs,false)}</div>`:""}`:""}</div>`}).join(""):`<div class="empty">אין שיעורים קודמים לפני האחרון</div>`}</div>
   <button class="btn" data-close>סגירה</button>`);
 }
 function rhHistorySheet(sid){
@@ -1285,7 +1294,7 @@ function rhHistorySheet(sid){
   const rest=ls.slice(1);
   openSheet(`<h2>${esc(st.name)} · היסטוריית שיעורים</h2>
   <div class="tiny muted">${ls.length?`השיעור הראשון: ${fmtD(ls[ls.length-1].date)} · `:""}השיעור האחרון מופיע בכרטיס, כאן כל מה שלפניו.</div>
-  <div class="list" style="gap:8px">${rest.length?rest.map(l=>`<div class="prevbox"><b class="tiny">${fmtD(l.date)}</b>${l.notes?`<div class="pre">${esc(l.notes)}</div>`:""}${l.nextPlan?`<div class="tiny muted" style="margin-top:4px"><b>נקבע לשיעור הבא:</b></div><div class="pre tiny">${esc(l.nextPlan)}</div>`:""}</div>`).join(""):`<div class="empty">אין עדיין שיעורים קודמים לפני האחרון</div>`}</div>
+  <div class="list" style="gap:8px">${rest.length?rest.map(l=>`<div class="prevbox"><b class="tiny">${fmtD(l.date)}</b>${l.notes?`<div class="pre">${linkify(esc(l.notes))}</div>`:""}${l.nextPlan?`<div class="tiny muted" style="margin-top:4px"><b>נקבע לשיעור הבא:</b></div><div class="pre tiny">${linkify(esc(l.nextPlan))}</div>`:""}</div>`).join(""):`<div class="empty">אין עדיין שיעורים קודמים לפני האחרון</div>`}</div>
   <button class="btn" data-close>סגירה</button>`);
 }
 function planSheet(id){
@@ -1295,7 +1304,7 @@ function planSheet(id){
   ${planFields({...l,id},"p")}
   <div class="row"><button class="btn primary" data-save>שמירה</button><button class="btn ghost" data-close>ביטול</button></div>`,r=>{
     r.querySelector("[data-save]").onclick=async()=>{await savePrev(r,"p");
-      if(await save("lessons",id,(()=>{const d={...strip(S.lessons[id]),plan:r.querySelector("#p_plan").value.trim(),nextPlan:r.querySelector("#p_next").value.trim()};{const bx=r.querySelector("#p_imgs");if(bx)d.planImgs=stripIds(bx)}if(d.plan&&d.plan===(prevLesson({...d,id})?.nextPlan||""))d.plan="";return d})())===null)return;closeSheet();toast("נשמר")};
+      if(await save("lessons",id,(()=>{const d={...strip(S.lessons[id]),plan:r.querySelector("#p_plan").value.trim(),nextPlan:r.querySelector("#p_next").value.trim()};{const bx=r.querySelector("#p_imgs");if(bx)d.planImgs=stripIds(bx);const nx=r.querySelector("#p_next_imgs");if(nx)d.nextImgs=stripIds(nx)}if(d.plan&&d.plan===(prevLesson({...d,id})?.nextPlan||""))d.plan="";return d})())===null)return;closeSheet();toast("נשמר")};
     setTimeout(()=>r.querySelector("#p_plan").focus(),50);
   });
 }
@@ -1885,6 +1894,19 @@ function unlockBg(){if(!document.body.classList.contains("sheetlock"))return;doc
   const fit=t=>{t.style.height="auto";t.style.height=Math.min(t.scrollHeight+2,innerHeight*.45)+"px"};
   document.addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")fit(e.target)});
   new MutationObserver(()=>document.querySelectorAll("textarea").forEach(t=>{if(!t.dataset.fit){t.dataset.fit=1;fit(t)}})).observe(document.body,{childList:true,subtree:true})})();
+/* קישורים בטקסט: כתובת שמתחילה ב־http או www הופכת לקישור לחיץ (בתצוגה), ומתחת לתיבת טקסט מופיעים הקישורים שבה */
+const URL_RX=/(https?:\/\/[^\s<]+|www\.[^\s<]+)/g;
+function linkify(h){return String(h||"").replace(URL_RX,m=>{let u=m,tail="";for(;;){const en=u.match(/&(quot|#39|#039|gt|lt);$/);if(en){tail=en[0]+tail;u=u.slice(0,-en[0].length);continue}if(/[.,;:!?)\]״']$/.test(u)&&!/&\w+;$/.test(u)){tail=u.slice(-1)+tail;u=u.slice(0,-1);continue}break}
+  const href=(/^www\./.test(u)?"https://":"")+u;let label=u.replace(/^https?:\/\//,"").replace(/^www\./,"");if(label.length>42)label=label.slice(0,40)+"…";
+  return `<a class="tlink" href="${href}" target="_blank" rel="noopener" dir="ltr">${label}</a>${tail}`})}
+function linkRow(t){if(!t||t.tagName!=="TEXTAREA")return;const host=t.closest("label")||t;let row=host.nextElementSibling;if(!(row&&row.classList.contains("tlinks"))){row=null}
+  const found=[...new Set((esc(t.value).match(URL_RX)||[]))];
+  if(!found.length){row?.remove();return}
+  if(!row){row=document.createElement("div");row.className="tlinks";host.after(row)}
+  row.innerHTML="🔗 "+found.map(u=>linkify(u)).join(" ")}
+document.addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")linkRow(e.target)});
+new MutationObserver(()=>document.querySelectorAll("#view textarea:not([data-lk]),#sheet textarea:not([data-lk])").forEach(t=>{t.dataset.lk=1;if(/https?:\/\/|www\./.test(t.value))linkRow(t)})).observe(document.body,{childList:true,subtree:true});
+document.addEventListener("click",e=>{if(e.target.closest("a.tlink"))e.stopPropagation()},true);
 /* ---------- טכניקות: מאגר תרגילים לפי שלב ---------- */
 const TECH_LEVELS=[["beg","קל"],["mid","בינוני"],["adv","קשה"]];
 const TECH_TOPICS=["פיתוח קול","ריפים"];
@@ -2067,7 +2089,7 @@ function lessonSheet(id,preset={}){
       if(data.plan&&data.plan===(prevLesson({...data,id:id||"_new"})?.nextPlan||""))data.plan="";
       await savePrev(r,"l");
       if(id)Object.keys(l).forEach(k=>{if(k!=="id"&&!(k in data))data[k]=l[k]});
-      {const bx=r.querySelector("#l_imgs");if(bx)data.planImgs=stripIds(bx)}
+      {const bx=r.querySelector("#l_imgs");if(bx)data.planImgs=stripIds(bx);const nx=r.querySelector("#l_next_imgs");if(nx)data.nextImgs=stripIds(nx)}
       if(!data.date){need(r,"l_date","חסר תאריך לשיעור");return}
       if(id){data.reminderSent=!!l.reminderSent;if(l.gcalId)data.gcalId=l.gcalId;if(l.gcalTitle)data.gcalTitle=l.gcalTitle}
       const sv=S.students[data.studentId];
@@ -2476,7 +2498,7 @@ function viewRH(){
         <input type="text" class="rhtrait" data-sid="${st.id}" value="${esc(st.traits||"")}" placeholder="תכונות בסיסיות: לוחץ מדי, משוחרר מדי…">
         ${st.notes?`<details class="rhbg"><summary class="tiny">רקע על התלמיד</summary><div class="tiny" style="white-space:pre-line;margin-top:4px">${esc(st.notes)}</div></details>`:""}
         ${(()=>{const pv=arr(S.rhLessons).filter(x=>x.sid===st.id&&x.date<rhDate&&x.attended!==false&&(x.notes||x.nextPlan)).sort((a,b)=>b.date.localeCompare(a.date))[0];
-          return pv?`<div class="prevbox"><b class="tiny">בשיעור הקודם · ${fmtD(pv.date)}</b> <button class="lnk" data-act="rhHistory" data-id="${st.id}">📖 שיעורים קודמים</button>${pv.notes?`<div class="pre">${esc(pv.notes)}</div>`:""}${pv.nextPlan?`<div class="tiny muted" style="margin-top:4px"><b>נקבע לשיעור הבא:</b></div><div class="pre tiny">${esc(pv.nextPlan)}</div>`:""}</div>`:""})()}
+          return pv?`<div class="prevbox"><b class="tiny">בשיעור הקודם · ${fmtD(pv.date)}</b> <button class="lnk" data-act="rhHistory" data-id="${st.id}">📖 שיעורים קודמים</button>${pv.notes?`<div class="pre">${linkify(esc(pv.notes))}</div>`:""}${pv.nextPlan?`<div class="tiny muted" style="margin-top:4px"><b>נקבע לשיעור הבא:</b></div><div class="pre tiny">${linkify(esc(pv.nextPlan))}</div>`:""}</div>`:""})()}
         <label class="f rhplan">נעבוד על<textarea data-rh="plan" placeholder="מה הטכניקה שצריך לשפר בשיעור הזה">${esc(rhPlanOf(st.id,rhDate))}</textarea></label>
         ${st.song?`<div class="tiny muted" style="margin:-2px 0 6px">שיר: ${esc(st.song)}</div>`:""}
         <label class="f">מה עשינו (למעקב באתר)<textarea data-rh="notes" placeholder="על מה עבדנו, מה השתפר, מה לתרגל" ${att?"":"disabled"}>${esc(l.notes||"")}</textarea></label>
