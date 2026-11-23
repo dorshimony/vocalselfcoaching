@@ -535,6 +535,11 @@ h1,h2,h3,.panel h2,.sheet h2{font-family:var(--body);font-weight:600;letter-spac
 .sheet .bad,.sheet .bad:focus{border-color:var(--red,#C62828)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--red,#C62828) 22%,transparent)!important}
 
 .rhbreak{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--warn-soft);color:var(--ink);font-size:.95rem}
+
+/* textareas fit their text: no oversized empty boxes, no accidental resize on touch */
+textarea{field-sizing:content;min-height:64px;max-height:45vh;overflow-y:auto}
+.rhcard textarea{min-height:56px}
+@media (hover:none){textarea{resize:none}}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -1875,6 +1880,11 @@ let _lockY=0;
 function lockBg(){if(document.body.classList.contains("sheetlock"))return;_lockY=window.scrollY;document.body.style.top=(-_lockY)+"px";document.body.classList.add("sheetlock")}
 function unlockBg(){if(!document.body.classList.contains("sheetlock"))return;document.body.classList.remove("sheetlock");document.body.style.top="";window.scrollTo(0,_lockY)}
 
+/* גודל תיבת טקסט לפי התוכן, לדפדפנים בלי field-sizing */
+(function(){if(window.CSS&&CSS.supports&&CSS.supports("field-sizing","content"))return;
+  const fit=t=>{t.style.height="auto";t.style.height=Math.min(t.scrollHeight+2,innerHeight*.45)+"px"};
+  document.addEventListener("input",e=>{if(e.target.tagName==="TEXTAREA")fit(e.target)});
+  new MutationObserver(()=>document.querySelectorAll("textarea").forEach(t=>{if(!t.dataset.fit){t.dataset.fit=1;fit(t)}})).observe(document.body,{childList:true,subtree:true})})();
 /* ---------- טכניקות: מאגר תרגילים לפי שלב ---------- */
 const TECH_LEVELS=[["beg","קל"],["mid","בינוני"],["adv","קשה"]];
 const TECH_TOPICS=["פיתוח קול","ריפים"];
