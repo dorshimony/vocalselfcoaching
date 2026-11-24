@@ -543,6 +543,14 @@ textarea{field-sizing:content;min-height:64px;max-height:45vh;overflow-y:auto}
 
 a.tlink{color:var(--accent);text-decoration:underline;text-underline-offset:2px;word-break:break-all;unicode-bidi:isolate}
 .tlinks{font-size:.85rem;margin-top:-4px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+
+.mtblw{overflow-x:auto}
+.mtbl{width:100%;border-collapse:collapse;font-size:.95rem}
+.mtbl th,.mtbl td{padding:7px 8px;text-align:start;border-bottom:1px solid var(--line);white-space:nowrap}
+.mtbl th{font-size:.82rem;color:var(--ink2);font-weight:600}
+.mtbl td.cash{font-weight:700}
+.mtbl tr.on td{background:var(--accent-soft)}
+.mtbl tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--line)}
 </style><style>nav.tabs [data-tab="rh"],[data-act="rhGo"],[data-act="rhPay"]{display:none!important}</style>
 
 <div class="wrap">
@@ -1447,6 +1455,9 @@ function viewMoney(){
     <div class="bars">${monthly.map((m,i)=>`<div class="bar" title="${MONTHS[i]}: הכנסות ${ils(m.i)}, הוצאות ${ils(m.e)}"><div class="pair"><div class="col" style="height:${m.i/max*100}%"></div><div class="col ex" style="height:${m.e/max*100}%"></div></div><span class="m">${MONTHS[i].slice(0,3)}</span></div>`).join("")}</div>
     ${ceiling?`<div style="margin-top:12px"><div class="spread tiny"><span>מחזור שנתי מול תקרת עוסק פטור</span><span class="num">${ils(yIn)} / ${ils(ceiling)}</span></div><div class="progress"><div style="width:${Math.min(100,yIn/ceiling*100)}%;${yIn/ceiling>.85?"background:var(--warn)":""}"></div></div></div>`:`<div class="tiny muted" style="margin-top:10px">אפשר להגדיר תקרת עוסק פטור בלשונית רשויות, ואז יופיע כאן מד התקדמות.</div>`}
   </div>
+  ${(()=>{const curM=finYear===now.getFullYear()?now.getMonth():11;const all12=[...Array(12)].map((_,i)=>{const k=ys+"-"+pad(i+1),P=pays.filter(p=>p.date?.startsWith(k));return {i,t:sum(P,()=>1),c:sum(P,p=>p.method==="מזומן"),b:sum(P,p=>p.method==="העברה")}});const f0=Math.min(curM,...all12.filter(r=>r.t).map(r=>r.i));const rows=all12.filter(r=>(r.i>=f0&&r.i<=curM)||r.t);
+    const T=rows.reduce((a,r)=>({t:a.t+r.t,c:a.c+r.c,b:a.b+r.b}),{t:0,c:0,b:0});
+    return `<div class="panel"><h2>הכנסות לפי חודש · ${finYear}</h2><div class="mtblw"><table class="mtbl"><thead><tr><th>חודש</th><th>סה״כ</th><th>💵 מזומן</th><th>העברות</th></tr></thead><tbody>${rows.map(r=>`<tr class="${r.i===finMonth?"on":""}"><td>${MONTHS[r.i]}</td><td class="num">${ils(r.t)}</td><td class="num cash">${ils(r.c)}</td><td class="num">${ils(r.b)}</td></tr>`).join("")}</tbody><tfoot><tr><td>סה״כ</td><td class="num">${ils(T.t)}</td><td class="num cash">${ils(T.c)}</td><td class="num">${ils(T.b)}</td></tr></tfoot></table></div><div class="tiny muted" style="margin-top:6px">לפי תאריך התשלום. תשלום בלי אמצעי לא נכלל במזומן או בהעברות.</div></div>`})()}
   <div class="grid2">
     <div class="panel"><h2>הכנסות השנה לפי מקור</h2>${Object.keys(bySrc).length?Object.entries(bySrc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="spread" style="padding:4px 0"><span>${esc(k)}</span><b class="num">${ils(v)}</b></div>`).join(""):`<div class="empty">אין הכנסות בשנה הזו</div>`}</div>
     <div class="panel"><h2>החודש לפי אמצעי תשלום</h2>${Object.keys(byMethod).length?Object.entries(byMethod).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="spread" style="padding:4px 0"><span>${esc(k)}</span><b class="num">${ils(v)}</b></div>`).join(""):`<div class="empty">אין תשלומים בחודש הזה</div>`}</div>
